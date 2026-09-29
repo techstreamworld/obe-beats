@@ -18,7 +18,7 @@ export function VolumePanel() {
 
   return (
     <div className="volume-panel">
-      {/* Master */}
+      {/* Master Volume */}
       <div className="control-row">
         <label htmlFor="vol-master">Master Volume</label>
         <div className="slider-group">
@@ -43,53 +43,54 @@ export function VolumePanel() {
         </div>
       </div>
 
-      {/* Left ear */}
-      <div className="control-row">
-        <label htmlFor="vol-left">Left Ear</label>
-        <div className="slider-group">
-          <input
-            id="vol-left"
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={leftVolume}
-            onChange={(e) => setLeftVolume(Number(e.target.value))}
-          />
-          <CommitInput
-            value={leftVolume}
-            min={0}
-            max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
-            parseInput={parsePercent}
-            onCommit={(v) => setLeftVolume(v)}
-            ariaLabel="Left ear volume percentage. Type value and press Enter."
-          />
+      {/* Left and Right Ear side-by-side (half-size sliders) */}
+      <div className="ear-balance-row">
+        <div className="control-row ear-half">
+          <label htmlFor="vol-left">Left Ear</label>
+          <div className="slider-group">
+            <input
+              id="vol-left"
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={leftVolume}
+              onChange={(e) => setLeftVolume(Number(e.target.value))}
+            />
+            <CommitInput
+              value={leftVolume}
+              min={0}
+              max={1}
+              formatDisplay={(v) => `${Math.round(v * 100)}%`}
+              parseInput={parsePercent}
+              onCommit={(v) => setLeftVolume(v)}
+              ariaLabel="Left ear volume percentage."
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Right ear */}
-      <div className="control-row">
-        <label htmlFor="vol-right">Right Ear</label>
-        <div className="slider-group">
-          <input
-            id="vol-right"
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={rightVolume}
-            onChange={(e) => setRightVolume(Number(e.target.value))}
-          />
-          <CommitInput
-            value={rightVolume}
-            min={0}
-            max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
-            parseInput={parsePercent}
-            onCommit={(v) => setRightVolume(v)}
-            ariaLabel="Right ear volume percentage. Type value and press Enter."
-          />
+        <div className="control-row ear-half">
+          <label htmlFor="vol-right">Right Ear</label>
+          <div className="slider-group">
+            <input
+              id="vol-right"
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={rightVolume}
+              onChange={(e) => setRightVolume(Number(e.target.value))}
+            />
+            <CommitInput
+              value={rightVolume}
+              min={0}
+              max={1}
+              formatDisplay={(v) => `${Math.round(v * 100)}%`}
+              parseInput={parsePercent}
+              onCommit={(v) => setRightVolume(v)}
+              ariaLabel="Right ear volume percentage."
+            />
+          </div>
         </div>
       </div>
     </div>

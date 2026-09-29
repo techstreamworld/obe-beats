@@ -63,7 +63,7 @@ export const useAppStore = create<AppState>((set) => ({
   setBeatFrequency: (hz) => set({ beatFrequency: hz }),
 
   // Volumes
-  masterVolume: 0.75,
+  masterVolume: 0.5,
   leftVolume: 1,
   rightVolume: 1,
   setMasterVolume: (v) => set({ masterVolume: v }),

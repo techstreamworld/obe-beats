@@ -3,5 +3,22 @@
 .volume-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+}
+
+/* Left and Right Ear side-by-side (half-size) */
+.ear-balance-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ear-half {
+  min-width: 0; /* Prevent grid overflow */
+}
+
+@media (max-width: 480px) {
+  .ear-balance-row {
+    gap: 8px;
+  }
 }

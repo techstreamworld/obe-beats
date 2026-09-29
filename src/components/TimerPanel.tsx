@@ -29,87 +29,89 @@ export function TimerPanel() {
 
   return (
     <div className="timer-panel">
-      {/* Countdown display */}
-      <div className="countdown" aria-live="polite" aria-label="Time remaining">
-        {timerState.isRunning
-          ? formatTime(timerState.remainingSeconds)
-          : timerDuration > 0
-            ? formatTime(timerDuration)
-            : '--:--'}
-      </div>
+      {/* Countdown and Session Duration row */}
+      <div className="timer-header-row">
+        <div className="countdown" aria-live="polite" aria-label="Time remaining">
+          {timerState.isRunning
+            ? formatTime(timerState.remainingSeconds)
+            : timerDuration > 0
+              ? formatTime(timerDuration)
+              : '--:--'}
+        </div>
 
-      {/* Session Duration (10m slider steps, any typed minute value with Enter) */}
-      <div className="control-row">
-        <label htmlFor="timer-duration">Session Duration</label>
-        <div className="slider-group">
-          <input
-            id="timer-duration"
-            type="range"
-            min={0}
-            max={120}
-            step={10}
-            value={durationMinutes}
-            onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
-          />
-          <CommitInput
-            value={durationMinutes}
-            min={0}
-            max={180}
-            formatDisplay={(min) => (min > 0 ? `${min} min` : 'Off')}
-            parseInput={parseSecondsOrOff}
-            onCommit={(min) => setTimerDuration(min * 60)}
-            ariaLabel="Session duration in minutes. Type value and press Enter."
-          />
+        <div className="control-row session-duration-row">
+          <label htmlFor="timer-duration">Session Duration</label>
+          <div className="slider-group">
+            <input
+              id="timer-duration"
+              type="range"
+              min={0}
+              max={120}
+              step={10}
+              value={durationMinutes}
+              onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
+            />
+            <CommitInput
+              value={durationMinutes}
+              min={0}
+              max={180}
+              formatDisplay={(min) => (min > 0 ? `${min} min` : 'Off')}
+              parseInput={parseSecondsOrOff}
+              onCommit={(min) => setTimerDuration(min * 60)}
+              ariaLabel="Session duration in minutes. Type value and press Enter."
+            />
+          </div>
         </div>
       </div>
 
-      {/* Fade-in */}
-      <div className="control-row">
-        <label htmlFor="fade-in">Fade In</label>
-        <div className="slider-group">
-          <input
-            id="fade-in"
-            type="range"
-            min={0}
-            max={30}
-            step={1}
-            value={fadeIn}
-            onChange={(e) => setFadeIn(Number(e.target.value))}
-          />
-          <CommitInput
-            value={fadeIn}
-            min={0}
-            max={30}
-            formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
-            parseInput={parseSecondsOrOff}
-            onCommit={(sec) => setFadeIn(sec)}
-            ariaLabel="Fade in duration in seconds. Type value and press Enter."
-          />
+      {/* Entire Track Fades (Side-by-side at start & end of entire audio) */}
+      <div className="fades-balance-row">
+        <div className="control-row fade-half">
+          <label htmlFor="fade-in">Track Fade In (Start)</label>
+          <div className="slider-group">
+            <input
+              id="fade-in"
+              type="range"
+              min={0}
+              max={30}
+              step={1}
+              value={fadeIn}
+              onChange={(e) => setFadeIn(Number(e.target.value))}
+            />
+            <CommitInput
+              value={fadeIn}
+              min={0}
+              max={30}
+              formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
+              parseInput={parseSecondsOrOff}
+              onCommit={(sec) => setFadeIn(sec)}
+              ariaLabel="Master track fade in duration at start."
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Fade-out */}
-      <div className="control-row">
-        <label htmlFor="fade-out">Fade Out</label>
-        <div className="slider-group">
-          <input
-            id="fade-out"
-            type="range"
-            min={0}
-            max={30}
-            step={1}
-            value={fadeOut}
-            onChange={(e) => setFadeOut(Number(e.target.value))}
-          />
-          <CommitInput
-            value={fadeOut}
-            min={0}
-            max={30}
-            formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
-            parseInput={parseSecondsOrOff}
-            onCommit={(sec) => setFadeOut(sec)}
-            ariaLabel="Fade out duration in seconds. Type value and press Enter."
-          />
+        <div className="control-row fade-half">
+          <label htmlFor="fade-out">Track Fade Out (End)</label>
+          <div className="slider-group">
+            <input
+              id="fade-out"
+              type="range"
+              min={0}
+              max={30}
+              step={1}
+              value={fadeOut}
+              onChange={(e) => setFadeOut(Number(e.target.value))}
+            />
+            <CommitInput
+              value={fadeOut}
+              min={0}
+              max={30}
+              formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
+              parseInput={parseSecondsOrOff}
+              onCommit={(sec) => setFadeOut(sec)}
+              ariaLabel="Master track fade out duration at end."
+            />
+          </div>
         </div>
       </div>
     </div>

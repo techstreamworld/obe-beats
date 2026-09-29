@@ -19,48 +19,55 @@ function App() {
   return (
     <div className="app-shell">
       <VersionBar />
+
       <header className="app-header">
-        <h1>OBE Beats</h1>
-        <p className="tagline">Binaural beats &amp; ambient sound generator</p>
-        <div className="header-actions">
+        <div className="header-brand">
+          <h1>OBE Beats</h1>
+          <p className="tagline">Binaural beats &amp; ambient sound generator</p>
+        </div>
+        <div className="header-transport">
+          <TransportBar />
+        </div>
+        <div className="header-extras">
           <BlackScreen />
         </div>
       </header>
 
       <main className="app-main">
-        {/* Transport */}
-        <section className="panel" aria-label="Transport controls">
-          <TransportBar />
-        </section>
+        {/* Left Column: Sound Generation & Levels */}
+        <div className="app-column">
+          <section className="panel" aria-labelledby="heading-frequencies">
+            <h2 id="heading-frequencies" className="panel-title">Binaural Frequencies</h2>
+            <FrequencyPanel />
+          </section>
 
-        {/* Frequency */}
-        <section className="panel" aria-label="Frequency controls">
-          <FrequencyPanel />
-        </section>
+          <section className="panel" aria-labelledby="heading-volume">
+            <h2 id="heading-volume" className="panel-title">Volume &amp; Balance</h2>
+            <VolumePanel />
+          </section>
 
-        {/* Volume */}
-        <section className="panel" aria-label="Volume controls">
-          <VolumePanel />
-        </section>
+          <section className="panel" aria-labelledby="heading-ambient">
+            <h2 id="heading-ambient" className="panel-title">Ambient Sound</h2>
+            <AmbientPanel />
+          </section>
+        </div>
 
-        {/* Timer & Fades */}
-        <section className="panel" aria-label="Timer">
-          <TimerPanel />
-        </section>
+        {/* Right Column: Session Runtime & Audio Export */}
+        <div className="app-column">
+          <section className="panel" aria-labelledby="heading-timer">
+            <h2 id="heading-timer" className="panel-title">Session Timer &amp; Master Track Fades</h2>
+            <TimerPanel />
+          </section>
 
-        {/* Ambient Sounds */}
-        <section className="panel" aria-label="Ambient sounds">
-          <AmbientPanel />
-        </section>
-
-        {/* WAV Export */}
-        <section className="panel" aria-label="WAV Export">
-          <ExportButton />
-        </section>
+          <section className="panel" aria-labelledby="heading-export">
+            <h2 id="heading-export" className="panel-title">Audio Export (WAV / MP3)</h2>
+            <ExportButton />
+          </section>
+        </div>
       </main>
 
       <footer className="app-footer">
-        <small>OBE Beats — use headphones for binaural effect</small>
+        <small>OBE Beats — use headphones for binaural brainwave entrainment</small>
       </footer>
     </div>
   )

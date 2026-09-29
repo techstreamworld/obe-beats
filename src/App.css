@@ -6,63 +6,116 @@
   min-height: 100svh;
 }
 
+/* ── Header Toolbar ── */
 .app-header {
-  padding: 32px 20px 24px;
-  text-align: center;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
 }
 
-.app-header h1 {
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header-brand h1 {
   margin: 0;
-  font-size: 32px;
-  letter-spacing: -1px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .tagline {
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 12px;
   color: var(--text);
 }
 
-.header-actions {
-  margin-top: 14px;
+.header-transport {
   display: flex;
   justify-content: center;
 }
 
+.header-extras {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Two-Column Main Dashboard ── */
 .app-main {
   flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.app-column {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  background: var(--border); /* subtle border divider between panels */
+  gap: 12px;
+  min-width: 0;
 }
 
+/* ── Unified Panel Cards ── */
 .panel {
-  padding: 24px 20px;
-  background: var(--bg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
+.panel-title {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--accent);
+}
+
+/* ── Footer ── */
 .app-footer {
-  padding: 20px;
+  padding: 8px 16px;
   text-align: center;
   border-top: 1px solid var(--border);
   color: var(--text);
-  font-size: 13px;
+  font-size: 11px;
+  background: var(--bg-surface);
 }
 
-/* ── Responsive Tablet & Desktop ── */
-
-@media (min-width: 768px) {
+/* ── Responsive Tablet & Mobile ── */
+@media (max-width: 768px) {
   .app-header {
-    padding: 40px 32px 28px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 10px;
   }
 
-  .app-header h1 {
-    font-size: 44px;
+  .header-brand {
+    width: 100%;
+    text-align: center;
   }
 
-  .panel {
-    padding: 28px 32px;
+  .header-transport {
+    flex: 1;
+  }
+
+  .header-extras {
+    flex-shrink: 0;
+  }
+
+  .app-main {
+    grid-template-columns: 1fr;
+    padding: 10px 12px;
+    gap: 10px;
   }
 }
