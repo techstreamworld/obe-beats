@@ -55,7 +55,7 @@ function App() {
         {/* Right Column: Session Runtime & Audio Export */}
         <div className="app-column">
           <section className="panel" aria-labelledby="heading-timer">
-            <h2 id="heading-timer" className="panel-title">Session Timer &amp; Master Track Fades</h2>
+            <h2 id="heading-timer" className="panel-title">Session Timer</h2>
             <TimerPanel />
           </section>
 

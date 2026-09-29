@@ -11,14 +11,10 @@ function formatTime(totalSeconds: number): string {
 
 export function TimerPanel() {
   const timerDuration = useAppStore((s) => s.timerDurationSeconds);
-  const fadeIn = useAppStore((s) => s.fadeInSeconds);
-  const fadeOut = useAppStore((s) => s.fadeOutSeconds);
   const timerState = useAppStore((s) => s.timerState);
   const setTimerDuration = useAppStore((s) => s.setTimerDuration);
-  const setFadeIn = useAppStore((s) => s.setFadeIn);
-  const setFadeOut = useAppStore((s) => s.setFadeOut);
 
-  // Convert stored seconds to minutes for slider & inputs
+  // Convert stored seconds to minutes for slider & inputs (up to 180 min / 3 hours)
   const durationMinutes = Math.round(timerDuration / 60);
 
   const parseSecondsOrOff = (str: string) => {
@@ -29,7 +25,7 @@ export function TimerPanel() {
 
   return (
     <div className="timer-panel">
-      {/* Countdown and Session Duration row */}
+      {/* Countdown and Session Duration row (Max 3 hours / 180 min) */}
       <div className="timer-header-row">
         <div className="countdown" aria-live="polite" aria-label="Time remaining">
           {timerState.isRunning
@@ -46,7 +42,7 @@ export function TimerPanel() {
               id="timer-duration"
               type="range"
               min={0}
-              max={120}
+              max={180}
               step={10}
               value={durationMinutes}
               onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
@@ -58,58 +54,7 @@ export function TimerPanel() {
               formatDisplay={(min) => (min > 0 ? `${min} min` : 'Off')}
               parseInput={parseSecondsOrOff}
               onCommit={(min) => setTimerDuration(min * 60)}
-              ariaLabel="Session duration in minutes. Type value and press Enter."
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Entire Track Fades (Side-by-side at start & end of entire audio) */}
-      <div className="fades-balance-row">
-        <div className="control-row fade-half">
-          <label htmlFor="fade-in">Track Fade In (Start)</label>
-          <div className="slider-group">
-            <input
-              id="fade-in"
-              type="range"
-              min={0}
-              max={30}
-              step={1}
-              value={fadeIn}
-              onChange={(e) => setFadeIn(Number(e.target.value))}
-            />
-            <CommitInput
-              value={fadeIn}
-              min={0}
-              max={30}
-              formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
-              parseInput={parseSecondsOrOff}
-              onCommit={(sec) => setFadeIn(sec)}
-              ariaLabel="Master track fade in duration at start."
-            />
-          </div>
-        </div>
-
-        <div className="control-row fade-half">
-          <label htmlFor="fade-out">Track Fade Out (End)</label>
-          <div className="slider-group">
-            <input
-              id="fade-out"
-              type="range"
-              min={0}
-              max={30}
-              step={1}
-              value={fadeOut}
-              onChange={(e) => setFadeOut(Number(e.target.value))}
-            />
-            <CommitInput
-              value={fadeOut}
-              min={0}
-              max={30}
-              formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
-              parseInput={parseSecondsOrOff}
-              onCommit={(sec) => setFadeOut(sec)}
-              ariaLabel="Master track fade out duration at end."
+              ariaLabel="Session duration in minutes (up to 180 min / 3 hours). Type value and press Enter."
             />
           </div>
         </div>

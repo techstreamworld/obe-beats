@@ -30,17 +30,6 @@
   flex: 1;
 }
 
-/* Master Track Fades side-by-side */
-.fades-balance-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.fade-half {
-  min-width: 0;
-}
-
 @media (max-width: 600px) {
   .timer-header-row {
     flex-direction: column;
@@ -49,11 +38,6 @@
   }
 
   .countdown {
-    font-size: 32px;
-  }
-
-  .fades-balance-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    font-size: 28px;
   }
 }

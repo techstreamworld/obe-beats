@@ -44,6 +44,9 @@
   display: flex;
   pointer-events: auto;
   opacity: 0;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* 10 seconds slow fade to black when activating */

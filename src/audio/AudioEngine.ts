@@ -21,7 +21,7 @@ export class AudioEngine {
 
   // Stored params (applied to nodes when they exist)
   private carrierFreq = 200;
-  private beatFreq = 10;
+  private beatFreq = 3;
   private masterVol = 0.5;
   private leftVol = 1;
   private rightVol = 1;

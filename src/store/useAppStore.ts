@@ -58,7 +58,7 @@ export const useAppStore = create<AppState>((set) => ({
 
   // Frequencies (sensible defaults)
   carrierFrequency: 200,
-  beatFrequency: 10,
+  beatFrequency: 3,
   setCarrierFrequency: (hz) => set({ carrierFrequency: hz }),
   setBeatFrequency: (hz) => set({ beatFrequency: hz }),
 
