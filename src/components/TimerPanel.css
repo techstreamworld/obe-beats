@@ -1,0 +1,23 @@
+/* ── TimerPanel ── */
+
+.timer-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.countdown {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: 2px;
+  padding: 8px 0;
+}
+
+@media (max-width: 480px) {
+  .countdown {
+    font-size: 36px;
+  }
+}

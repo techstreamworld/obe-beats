@@ -1,0 +1,25 @@
+/* ── FrequencyPanel ── */
+
+.frequency-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.freq-readout {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.ear-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  padding: 6px 14px;
+  border-radius: 6px;
+}
