@@ -1,8 +1,12 @@
 // ─── WavExporter ───
-// Renders the session offline and encodes it to a 16-bit PCM stereo WAV Blob.
+// Renders the session offline and encodes it to WAV or MP3 (320 kbps / 192 kbps).
 // Pure Web Audio API / TypeScript — no React.
 
+import { Mp3Encoder } from '@breezystack/lamejs';
+import { AMBIENT_GAIN_SCALE } from './AmbientPlayer.ts';
 import { NoiseGenerator } from './NoiseGenerator.ts';
+
+export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
 
 export interface RenderOptions {
   carrierFrequency: number;
@@ -18,15 +22,49 @@ export interface RenderOptions {
   sampleRate?: number;
 }
 
+export interface ExportResult {
+  blob: Blob;
+  filename: string;
+}
+
 export class WavExporter {
   /**
-   * Renders the session to an AudioBuffer using OfflineAudioContext,
-   * then encodes it as a 16-bit PCM WAV file.
+   * Calculates human-readable estimated file size based on duration and format.
    */
-  static async exportToWav(
+  static getEstimatedFileSize(durationSeconds: number, format: ExportFormat): string {
+    const duration = Math.max(1, durationSeconds);
+    let bytes = 0;
+
+    switch (format) {
+      case 'wav':
+        // 44.1 kHz, 16-bit, 2 channels = 176,400 bytes/sec + 44 bytes header
+        bytes = 44 + duration * 176400;
+        break;
+      case 'mp3-320':
+        // 320 kbps = 40,000 bytes/sec
+        bytes = duration * 40000;
+        break;
+      case 'mp3-192':
+        // 192 kbps = 24,000 bytes/sec
+        bytes = duration * 24000;
+        break;
+    }
+
+    if (bytes >= 1024 * 1024) {
+      return `~${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    return `~${Math.round(bytes / 1024)} KB`;
+  }
+
+  /**
+   * Renders the session to an AudioBuffer using OfflineAudioContext,
+   * then encodes it to the chosen format (WAV, MP3 320, or MP3 192).
+   */
+  static async exportAudio(
     options: RenderOptions,
+    format: ExportFormat = 'wav',
     onStatusChange?: (status: 'rendering' | 'encoding' | 'done') => void,
-  ): Promise<Blob> {
+  ): Promise<ExportResult> {
     const sampleRate = options.sampleRate ?? 44100;
     const duration = Math.max(1, options.durationSeconds);
     const totalSamples = Math.floor(sampleRate * duration);
@@ -52,7 +90,6 @@ export class WavExporter {
 
     if (fadeOut > 0) {
       const fadeOutStart = Math.max(0, duration - fadeOut);
-      // If fade-in overlaps with fade-out, preserve scheduled slope
       if (fadeOutStart > fadeIn) {
         masterGain.gain.setValueAtTime(masterVol, fadeOutStart);
       }
@@ -89,10 +126,11 @@ export class WavExporter {
     rightOsc.start(0);
     rightOsc.stop(duration);
 
-    // ── Ambient Sound (if selected) ──
+    // ── Ambient Sound (if selected) with default attenuation ──
     if (options.ambientId) {
       const ambientGain = offlineCtx.createGain();
-      ambientGain.gain.setValueAtTime(options.ambientVolume, 0);
+      // Apply AMBIENT_GAIN_SCALE so ambient is appropriately quiet by default
+      ambientGain.gain.setValueAtTime(options.ambientVolume * AMBIENT_GAIN_SCALE, 0);
       ambientGain.connect(masterGain);
 
       const ambientBuffer = await this.getAmbientBuffer(offlineCtx, options.ambientId);
@@ -109,12 +147,36 @@ export class WavExporter {
     // ── Offline Render ──
     const renderedBuffer = await offlineCtx.startRendering();
 
-    // ── WAV Encoding ──
+    // ── Encoding ──
     onStatusChange?.('encoding');
-    const wavBlob = this.encodeWav(renderedBuffer);
+
+    let blob: Blob;
+    let extension: string;
+    const durationMin = Math.round(duration / 60) || 1;
+    const baseName = `obe-beats_${options.carrierFrequency}hz_${options.beatFrequency}hz_${durationMin}m`;
+
+    if (format === 'wav') {
+      blob = this.encodeWav(renderedBuffer);
+      extension = 'wav';
+    } else {
+      const kbps = format === 'mp3-320' ? 320 : 192;
+      blob = this.encodeMp3(renderedBuffer, kbps);
+      extension = `${kbps}kbps.mp3`;
+    }
+
+    const filename = `${baseName}.${extension}`;
 
     onStatusChange?.('done');
-    return wavBlob;
+    return { blob, filename };
+  }
+
+  /** Backward-compatible exportToWav call */
+  static async exportToWav(
+    options: RenderOptions,
+    onStatusChange?: (status: 'rendering' | 'encoding' | 'done') => void,
+  ): Promise<Blob> {
+    const result = await this.exportAudio(options, 'wav', onStatusChange);
+    return result.blob;
   }
 
   /**
@@ -205,13 +267,11 @@ export class WavExporter {
 
     let offset = 44;
     for (let i = 0; i < numFrames; i++) {
-      // Left channel sample
       let sLeft = leftData[i];
       sLeft = Math.max(-1, Math.min(1, sLeft));
       view.setInt16(offset, sLeft < 0 ? sLeft * 0x8000 : sLeft * 0x7FFF, true);
       offset += 2;
 
-      // Right channel sample
       let sRight = rightData[i];
       sRight = Math.max(-1, Math.min(1, sRight));
       view.setInt16(offset, sRight < 0 ? sRight * 0x8000 : sRight * 0x7FFF, true);
@@ -219,6 +279,51 @@ export class WavExporter {
     }
 
     return new Blob([arrayBuffer], { type: 'audio/wav' });
+  }
+
+  /**
+   * Encodes an AudioBuffer into MP3 format at the specified bitrate.
+   */
+  private static encodeMp3(buffer: AudioBuffer, kbps: number): Blob {
+    const numChannels = 2;
+    const sampleRate = buffer.sampleRate;
+    const numFrames = buffer.length;
+
+    const encoder = new Mp3Encoder(numChannels, sampleRate, kbps);
+
+    const leftData = buffer.getChannelData(0);
+    const rightData = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : leftData;
+
+    // Convert Float32Array [-1.0, 1.0] to Int16Array
+    const leftInt16 = new Int16Array(numFrames);
+    const rightInt16 = new Int16Array(numFrames);
+
+    for (let i = 0; i < numFrames; i++) {
+      const sLeft = Math.max(-1, Math.min(1, leftData[i]));
+      leftInt16[i] = sLeft < 0 ? sLeft * 0x8000 : sLeft * 0x7FFF;
+
+      const sRight = Math.max(-1, Math.min(1, rightData[i]));
+      rightInt16[i] = sRight < 0 ? sRight * 0x8000 : sRight * 0x7FFF;
+    }
+
+    const mp3Chunks: Uint8Array[] = [];
+    const sampleBlockSize = 1152;
+
+    for (let i = 0; i < numFrames; i += sampleBlockSize) {
+      const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
+      const rightChunk = rightInt16.subarray(i, i + sampleBlockSize);
+      const mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
+      if (mp3buf.length > 0) {
+        mp3Chunks.push(new Uint8Array(mp3buf));
+      }
+    }
+
+    const end = encoder.flush();
+    if (end.length > 0) {
+      mp3Chunks.push(new Uint8Array(end));
+    }
+
+    return new Blob(mp3Chunks as BlobPart[], { type: 'audio/mp3' });
   }
 
   private static writeString(view: DataView, offset: number, string: string): void {

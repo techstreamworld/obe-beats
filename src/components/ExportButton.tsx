@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WavExporter } from '../audio/WavExporter.ts';
+import { WavExporter, type ExportFormat } from '../audio/WavExporter.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './ExportButton.css';
 
@@ -13,6 +13,7 @@ const DURATION_PRESETS = [
 
 export function ExportButton() {
   const [selectedDuration, setSelectedDuration] = useState(300); // 5 minutes default
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('wav');
   const exportStatus = useAppStore((s) => s.exportStatus);
   const setExportStatus = useAppStore((s) => s.setExportStatus);
 
@@ -34,7 +35,7 @@ export function ExportButton() {
     try {
       setExportStatus('rendering');
 
-      const blob = await WavExporter.exportToWav(
+      const { blob, filename } = await WavExporter.exportAudio(
         {
           carrierFrequency,
           beatFrequency,
@@ -47,17 +48,17 @@ export function ExportButton() {
           fadeInSeconds,
           fadeOutSeconds,
         },
+        exportFormat,
         (status) => setExportStatus(status),
       );
 
-      const filename = `obe-beats_${carrierFrequency}hz_${beatFrequency}hz_${selectedDuration / 60}m.wav`;
       WavExporter.triggerDownload(blob, filename);
 
       setTimeout(() => {
         setExportStatus('idle');
       }, 2500);
     } catch (err) {
-      console.error('WAV export error:', err);
+      console.error('Audio export error:', err);
       setExportStatus('error');
       setTimeout(() => setExportStatus('idle'), 3500);
     }
@@ -68,9 +69,11 @@ export function ExportButton() {
       case 'rendering':
         return 'Rendering offline audio...';
       case 'encoding':
-        return 'Encoding 16-bit WAV file...';
+        return exportFormat === 'wav'
+          ? 'Encoding 16-bit WAV file...'
+          : 'Encoding MP3 audio stream...';
       case 'done':
-        return '✓ Export ready! Downloading...';
+        return '✓ Export complete! Downloading...';
       case 'error':
         return '⚠ Export failed. Please try again.';
       default:
@@ -78,8 +81,15 @@ export function ExportButton() {
     }
   };
 
+  const wavSize = WavExporter.getEstimatedFileSize(selectedDuration, 'wav');
+  const mp3_320Size = WavExporter.getEstimatedFileSize(selectedDuration, 'mp3-320');
+  const mp3_192Size = WavExporter.getEstimatedFileSize(selectedDuration, 'mp3-192');
+
+  const buttonLabel = exportFormat === 'wav' ? 'Export WAV' : 'Export MP3';
+
   return (
     <div className="export-panel">
+      {/* Duration selector */}
       <div className="control-row">
         <label htmlFor="export-duration">Export Duration</label>
         <div className="preset-group">
@@ -97,18 +107,35 @@ export function ExportButton() {
         </div>
       </div>
 
+      {/* Format setting dropdown with size estimation */}
+      <div className="control-row">
+        <label htmlFor="export-format-select">Export Format &amp; File Size</label>
+        <select
+          id="export-format-select"
+          className="export-select"
+          value={exportFormat}
+          onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+          disabled={isExporting}
+        >
+          <option value="wav">WAV (Best) — {wavSize}</option>
+          <option value="mp3-320">MP3 320 kbps (High) — {mp3_320Size}</option>
+          <option value="mp3-192">MP3 192 kbps (Good) — {mp3_192Size}</option>
+        </select>
+      </div>
+
+      {/* Separate Export Button */}
       <div className="export-action-row">
         <button
           type="button"
           className={`export-btn ${isExporting ? 'is-loading' : ''}`}
           onClick={handleExport}
           disabled={isExporting}
-          aria-label="Export session as WAV file"
+          aria-label={`${buttonLabel} file (${exportFormat})`}
         >
           <span className="export-icon" aria-hidden="true">
             {isExporting ? '⏳' : '💾'}
           </span>
-          {isExporting ? 'Exporting...' : 'Export WAV'}
+          {isExporting ? 'Exporting...' : buttonLabel}
         </button>
 
         {getStatusText() && (

@@ -4,6 +4,9 @@
 
 import { NoiseGenerator } from './NoiseGenerator.ts';
 
+/** Scaling factor to keep ambient layers subtler by default beneath the binaural tones */
+export const AMBIENT_GAIN_SCALE = 0.35;
+
 /** IDs of noise types that are generated in code (no file needed). */
 const GENERATED_NOISE_IDS = ['white-noise', 'pink-noise', 'brown-noise'] as const;
 
@@ -19,6 +22,7 @@ export class AmbientPlayer {
   constructor(ctx: AudioContext, destination: AudioNode) {
     this.ctx = ctx;
     this.gainNode = ctx.createGain();
+    this.gainNode.gain.value = 0.5 * AMBIENT_GAIN_SCALE;
     this.gainNode.connect(destination);
   }
 
@@ -55,7 +59,7 @@ export class AmbientPlayer {
   }
 
   setVolume(v: number): void {
-    this.gainNode.gain.setTargetAtTime(v, this.ctx.currentTime, 0.02);
+    this.gainNode.gain.setTargetAtTime(v * AMBIENT_GAIN_SCALE, this.ctx.currentTime, 0.02);
   }
 
   get output(): GainNode {

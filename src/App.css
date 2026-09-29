@@ -24,6 +24,12 @@
   color: var(--text);
 }
 
+.header-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
 .app-main {
   flex: 1;
   display: flex;

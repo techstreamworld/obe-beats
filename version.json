@@ -1,4 +1,4 @@
 {
-  "version": 1,
-  "lastUpdate": "Initial release with binaural audio, ambient noise, timer & WAV export"
+  "version": 2,
+  "lastUpdate": "Added Black Screen mode, lower default ambient volume, and MP3/WAV export options"
 }

@@ -11,6 +11,7 @@
     "bump": "node scripts/bump-version.js"
   },
   "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zustand": "^5.0.15"
