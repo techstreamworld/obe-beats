@@ -1,4 +1,4 @@
 {
-  "version": 24,
-  "lastUpdate": "Removed export duration preset buttons, linked export to session duration"
+  "version": 25,
+  "lastUpdate": "Updated VolumePanel.css"
 }
