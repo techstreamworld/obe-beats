@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/useAppStore.ts';
+import { CommitInput } from './CommitInput.tsx';
 import './FrequencyPanel.css';
 
 export function FrequencyPanel() {
@@ -21,11 +22,22 @@ export function FrequencyPanel() {
             type="range"
             min={0.5}
             max={40}
-            step={0.5}
+            step={0.1}
             value={beatFrequency}
             onChange={(e) => setBeatFrequency(Number(e.target.value))}
           />
-          <span className="value-badge">{beatFrequency.toFixed(1)} Hz</span>
+          <CommitInput
+            value={beatFrequency}
+            min={0.5}
+            max={40.0}
+            formatDisplay={(v) => `${v.toFixed(1)} Hz`}
+            parseInput={(str) => {
+              const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+              return isNaN(num) ? null : Math.round(num * 10) / 10;
+            }}
+            onCommit={(v) => setBeatFrequency(v)}
+            ariaLabel="Beat frequency in Hertz. Type exact value and press Enter."
+          />
         </div>
       </div>
 
@@ -42,7 +54,18 @@ export function FrequencyPanel() {
             value={carrierFrequency}
             onChange={(e) => setCarrierFrequency(Number(e.target.value))}
           />
-          <span className="value-badge">{carrierFrequency} Hz</span>
+          <CommitInput
+            value={carrierFrequency}
+            min={20}
+            max={1500}
+            formatDisplay={(v) => `${Math.round(v)} Hz`}
+            parseInput={(str) => {
+              const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+              return isNaN(num) ? null : Math.round(num);
+            }}
+            onCommit={(v) => setCarrierFrequency(v)}
+            ariaLabel="Carrier frequency in Hertz. Type exact value and press Enter."
+          />
         </div>
       </div>
 

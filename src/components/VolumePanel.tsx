@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/useAppStore.ts';
+import { CommitInput } from './CommitInput.tsx';
 import './VolumePanel.css';
 
 export function VolumePanel() {
@@ -9,22 +10,36 @@ export function VolumePanel() {
   const setLeftVolume = useAppStore((s) => s.setLeftVolume);
   const setRightVolume = useAppStore((s) => s.setRightVolume);
 
+  const parsePercent = (str: string) => {
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(num)) return null;
+    return Math.min(1, Math.max(0, Math.round(num) / 100));
+  };
+
   return (
     <div className="volume-panel">
       {/* Master */}
       <div className="control-row">
-        <label htmlFor="vol-master">Master</label>
+        <label htmlFor="vol-master">Master Volume</label>
         <div className="slider-group">
           <input
             id="vol-master"
             type="range"
             min={0}
             max={1}
-            step={0.01}
+            step={0.05}
             value={masterVolume}
             onChange={(e) => setMasterVolume(Number(e.target.value))}
           />
-          <span className="value-badge">{Math.round(masterVolume * 100)}%</span>
+          <CommitInput
+            value={masterVolume}
+            min={0}
+            max={1}
+            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            parseInput={parsePercent}
+            onCommit={(v) => setMasterVolume(v)}
+            ariaLabel="Master volume percentage. Type value and press Enter."
+          />
         </div>
       </div>
 
@@ -37,11 +52,19 @@ export function VolumePanel() {
             type="range"
             min={0}
             max={1}
-            step={0.01}
+            step={0.05}
             value={leftVolume}
             onChange={(e) => setLeftVolume(Number(e.target.value))}
           />
-          <span className="value-badge">{Math.round(leftVolume * 100)}%</span>
+          <CommitInput
+            value={leftVolume}
+            min={0}
+            max={1}
+            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            parseInput={parsePercent}
+            onCommit={(v) => setLeftVolume(v)}
+            ariaLabel="Left ear volume percentage. Type value and press Enter."
+          />
         </div>
       </div>
 
@@ -54,11 +77,19 @@ export function VolumePanel() {
             type="range"
             min={0}
             max={1}
-            step={0.01}
+            step={0.05}
             value={rightVolume}
             onChange={(e) => setRightVolume(Number(e.target.value))}
           />
-          <span className="value-badge">{Math.round(rightVolume * 100)}%</span>
+          <CommitInput
+            value={rightVolume}
+            min={0}
+            max={1}
+            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            parseInput={parsePercent}
+            onCommit={(v) => setRightVolume(v)}
+            ariaLabel="Right ear volume percentage. Type value and press Enter."
+          />
         </div>
       </div>
     </div>

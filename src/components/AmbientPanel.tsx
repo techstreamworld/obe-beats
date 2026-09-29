@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/useAppStore.ts';
+import { CommitInput } from './CommitInput.tsx';
 import type { AmbientSoundEntry } from '../types/index.ts';
 import './AmbientPanel.css';
 
@@ -22,6 +23,12 @@ export function AmbientPanel() {
   const ambientVolume = useAppStore((s) => s.ambientVolume);
   const setSelected = useAppStore((s) => s.setSelectedAmbient);
   const setVolume = useAppStore((s) => s.setAmbientVolume);
+
+  const parsePercent = (str: string) => {
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(num)) return null;
+    return Math.min(1, Math.max(0, Math.round(num) / 100));
+  };
 
   return (
     <div className="ambient-panel">
@@ -60,13 +67,19 @@ export function AmbientPanel() {
               type="range"
               min={0}
               max={1}
-              step={0.01}
+              step={0.05}
               value={ambientVolume}
               onChange={(e) => setVolume(Number(e.target.value))}
             />
-            <span className="value-badge">
-              {Math.round(ambientVolume * 100)}%
-            </span>
+            <CommitInput
+              value={ambientVolume}
+              min={0}
+              max={1}
+              formatDisplay={(v) => `${Math.round(v * 100)}%`}
+              parseInput={parsePercent}
+              onCommit={(v) => setVolume(v)}
+              ariaLabel="Ambient volume percentage. Type value and press Enter."
+            />
           </div>
         </div>
       )}

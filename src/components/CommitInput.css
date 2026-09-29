@@ -1,0 +1,35 @@
+/* ── CommitInput ── */
+
+.commit-input {
+  width: 82px;
+  min-height: 36px;
+  padding: 4px 8px;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  cursor: text;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.commit-input:hover {
+  border-color: var(--accent-border);
+}
+
+.commit-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 480px) {
+  .commit-input {
+    width: 72px;
+    font-size: 12px;
+  }
+}

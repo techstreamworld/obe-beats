@@ -1,4 +1,5 @@
 import { useAppStore } from '../store/useAppStore.ts';
+import { CommitInput } from './CommitInput.tsx';
 import './TimerPanel.css';
 
 /** Format seconds as mm:ss. */
@@ -17,8 +18,14 @@ export function TimerPanel() {
   const setFadeIn = useAppStore((s) => s.setFadeIn);
   const setFadeOut = useAppStore((s) => s.setFadeOut);
 
-  // Convert stored seconds to minutes for the input
-  const durationMinutes = timerDuration / 60;
+  // Convert stored seconds to minutes for slider & inputs
+  const durationMinutes = Math.round(timerDuration / 60);
+
+  const parseSecondsOrOff = (str: string) => {
+    if (str.toLowerCase().includes('off') || str.trim() === '0') return 0;
+    const num = parseInt(str.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? null : num;
+  };
 
   return (
     <div className="timer-panel">
@@ -31,7 +38,7 @@ export function TimerPanel() {
             : '--:--'}
       </div>
 
-      {/* Duration */}
+      {/* Session Duration (10m slider steps, any typed minute value with Enter) */}
       <div className="control-row">
         <label htmlFor="timer-duration">Session Duration</label>
         <div className="slider-group">
@@ -40,13 +47,19 @@ export function TimerPanel() {
             type="range"
             min={0}
             max={120}
-            step={1}
+            step={10}
             value={durationMinutes}
             onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
           />
-          <span className="value-badge">
-            {durationMinutes > 0 ? `${durationMinutes} min` : 'Off'}
-          </span>
+          <CommitInput
+            value={durationMinutes}
+            min={0}
+            max={180}
+            formatDisplay={(min) => (min > 0 ? `${min} min` : 'Off')}
+            parseInput={parseSecondsOrOff}
+            onCommit={(min) => setTimerDuration(min * 60)}
+            ariaLabel="Session duration in minutes. Type value and press Enter."
+          />
         </div>
       </div>
 
@@ -63,9 +76,15 @@ export function TimerPanel() {
             value={fadeIn}
             onChange={(e) => setFadeIn(Number(e.target.value))}
           />
-          <span className="value-badge">
-            {fadeIn > 0 ? `${fadeIn}s` : 'Off'}
-          </span>
+          <CommitInput
+            value={fadeIn}
+            min={0}
+            max={30}
+            formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
+            parseInput={parseSecondsOrOff}
+            onCommit={(sec) => setFadeIn(sec)}
+            ariaLabel="Fade in duration in seconds. Type value and press Enter."
+          />
         </div>
       </div>
 
@@ -82,9 +101,15 @@ export function TimerPanel() {
             value={fadeOut}
             onChange={(e) => setFadeOut(Number(e.target.value))}
           />
-          <span className="value-badge">
-            {fadeOut > 0 ? `${fadeOut}s` : 'Off'}
-          </span>
+          <CommitInput
+            value={fadeOut}
+            min={0}
+            max={30}
+            formatDisplay={(sec) => (sec > 0 ? `${sec}s` : 'Off')}
+            parseInput={parseSecondsOrOff}
+            onCommit={(sec) => setFadeOut(sec)}
+            ariaLabel="Fade out duration in seconds. Type value and press Enter."
+          />
         </div>
       </div>
     </div>

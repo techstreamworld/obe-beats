@@ -1,4 +1,4 @@
 {
-  "version": 2,
-  "lastUpdate": "Added Black Screen mode, lower default ambient volume, and MP3/WAV export options"
+  "version": 5,
+  "lastUpdate": "Updated useTimer.ts"
 }

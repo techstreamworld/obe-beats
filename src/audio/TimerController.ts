@@ -33,6 +33,26 @@ export class TimerController {
     }, 1000);
   }
 
+  /** Smoothly adjust duration during an active session without restarting or stopping. */
+  adjustDuration(newDurationSeconds: number, previousDurationSeconds: number): void {
+    if (!this.isRunning) {
+      if (newDurationSeconds > 0) {
+        this.start(newDurationSeconds);
+      }
+      return;
+    }
+
+    if (newDurationSeconds <= 0) {
+      this.stop();
+      this.onTick(0);
+      return;
+    }
+
+    const elapsed = Math.max(0, previousDurationSeconds - this.remaining);
+    this.remaining = Math.max(1, newDurationSeconds - elapsed);
+    this.onTick(this.remaining);
+  }
+
   /** Stop the countdown and clear the interval. */
   stop(): void {
     if (this.intervalId !== null) {
