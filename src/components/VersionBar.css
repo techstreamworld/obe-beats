@@ -1,0 +1,48 @@
+/* ── VersionBar ── */
+
+.version-bar-container {
+  width: 100%;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.version-field {
+  width: 100%;
+  max-width: 680px;
+  min-height: 38px;
+  padding: 6px 14px;
+  background: var(--bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  color: var(--text-h);
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  cursor: default;
+  user-select: all;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.version-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+@media (max-width: 480px) {
+  .version-bar-container {
+    padding: 6px 12px;
+  }
+
+  .version-field {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}

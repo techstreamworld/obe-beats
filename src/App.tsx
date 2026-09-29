@@ -6,6 +6,7 @@ import { VolumePanel } from './components/VolumePanel.tsx'
 import { TimerPanel } from './components/TimerPanel.tsx'
 import { AmbientPanel } from './components/AmbientPanel.tsx'
 import { ExportButton } from './components/ExportButton.tsx'
+import { VersionBar } from './components/VersionBar.tsx'
 import './App.css'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <VersionBar />
       <header className="app-header">
         <h1>OBE Beats</h1>
         <p className="tagline">Binaural beats &amp; ambient sound generator</p>
