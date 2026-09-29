@@ -1,4 +1,4 @@
 {
-  "version": 21,
-  "lastUpdate": "Compact 1-screen layout, 50% master volume, half-size L/R sliders, track fades, push-to-github.bat"
+  "version": 24,
+  "lastUpdate": "Removed export duration preset buttons, linked export to session duration"
 }

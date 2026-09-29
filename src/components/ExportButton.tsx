@@ -3,16 +3,7 @@ import { WavExporter, type ExportFormat } from '../audio/WavExporter.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './ExportButton.css';
 
-const DURATION_PRESETS = [
-  { label: '1 min', seconds: 60 },
-  { label: '5 min', seconds: 300 },
-  { label: '15 min', seconds: 900 },
-  { label: '30 min', seconds: 1800 },
-  { label: '60 min', seconds: 3600 },
-];
-
 export function ExportButton() {
-  const [selectedDuration, setSelectedDuration] = useState(300); // 5 minutes default
   const [exportFormat, setExportFormat] = useState<ExportFormat>('wav');
   const exportStatus = useAppStore((s) => s.exportStatus);
   const setExportStatus = useAppStore((s) => s.setExportStatus);
@@ -26,6 +17,10 @@ export function ExportButton() {
   const ambientVolume = useAppStore((s) => s.ambientVolume);
   const fadeInSeconds = useAppStore((s) => s.fadeInSeconds);
   const fadeOutSeconds = useAppStore((s) => s.fadeOutSeconds);
+  const timerDurationSeconds = useAppStore((s) => s.timerDurationSeconds);
+
+  // Use session duration (defaults to 5 minutes if timer is Off)
+  const exportDuration = timerDurationSeconds > 0 ? timerDurationSeconds : 300;
 
   const isExporting = exportStatus === 'rendering' || exportStatus === 'encoding';
 
@@ -44,7 +39,7 @@ export function ExportButton() {
           rightVolume,
           ambientId: selectedAmbientId,
           ambientVolume,
-          durationSeconds: selectedDuration,
+          durationSeconds: exportDuration,
           fadeInSeconds,
           fadeOutSeconds,
         },
@@ -81,32 +76,14 @@ export function ExportButton() {
     }
   };
 
-  const wavSize = WavExporter.getEstimatedFileSize(selectedDuration, 'wav');
-  const mp3_320Size = WavExporter.getEstimatedFileSize(selectedDuration, 'mp3-320');
-  const mp3_192Size = WavExporter.getEstimatedFileSize(selectedDuration, 'mp3-192');
+  const wavSize = WavExporter.getEstimatedFileSize(exportDuration, 'wav');
+  const mp3_320Size = WavExporter.getEstimatedFileSize(exportDuration, 'mp3-320');
+  const mp3_192Size = WavExporter.getEstimatedFileSize(exportDuration, 'mp3-192');
 
   const buttonLabel = exportFormat === 'wav' ? 'Export WAV' : 'Export MP3';
 
   return (
     <div className="export-panel">
-      {/* Duration selector */}
-      <div className="control-row">
-        <label htmlFor="export-duration">Export Duration</label>
-        <div className="preset-group">
-          {DURATION_PRESETS.map((preset) => (
-            <button
-              key={preset.seconds}
-              type="button"
-              className={`preset-btn ${selectedDuration === preset.seconds ? 'is-active' : ''}`}
-              onClick={() => setSelectedDuration(preset.seconds)}
-              disabled={isExporting}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Format setting dropdown with size estimation */}
       <div className="control-row">
         <label htmlFor="export-format-select">Export Format &amp; File Size</label>
