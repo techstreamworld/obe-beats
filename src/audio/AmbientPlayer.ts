@@ -1,97 +1,189 @@
 // ─── AmbientPlayer ───
-// Plays a single ambient sound (noise or audio file) in a loop.
+// Plays multiple ambient sound layers (noise or audio files) simultaneously with independent volume controls.
 // Pure Web Audio API — no React.
 
 import { NoiseGenerator } from './NoiseGenerator.ts';
+import type { AmbientLayer } from '../types/index.ts';
 
 /** Scaling factor to keep ambient layers subtler by default beneath the binaural tones */
 export const AMBIENT_GAIN_SCALE = 0.35;
 
 /** IDs of noise types that are generated in code (no file needed). */
-const GENERATED_NOISE_IDS = ['white-noise', 'pink-noise', 'brown-noise'] as const;
+const GENERATED_NOISE_IDS = ['white-noise', 'pink-noise', 'brown-noise', 'black-noise'] as const;
+
+interface ActiveLayer {
+  layerId: string;
+  soundId: string | null;
+  volume: number;
+  sourceNode: AudioBufferSourceNode | null;
+  gainNode: GainNode;
+}
 
 export class AmbientPlayer {
   private ctx: AudioContext;
-  private gainNode: GainNode;
-  private sourceNode: AudioBufferSourceNode | null = null;
-  private currentId: string | null = null;
+  private destination: AudioNode;
+  private layers = new Map<string, ActiveLayer>();
+  private _isPlaying = false;
 
   /** Cache so we don't regenerate noise buffers every time. */
   private bufferCache = new Map<string, AudioBuffer>();
 
   constructor(ctx: AudioContext, destination: AudioNode) {
     this.ctx = ctx;
-    this.gainNode = ctx.createGain();
-    this.gainNode.gain.value = 0.5 * AMBIENT_GAIN_SCALE;
-    this.gainNode.connect(destination);
+    this.destination = destination;
   }
 
-  /** Start playing the ambient sound with the given id. */
-  async play(id: string): Promise<void> {
-    // Already playing this sound — no-op
-    if (this.currentId === id && this.sourceNode) return;
-
-    this.stop();
-
-    const buffer = await this.getBuffer(id);
-    if (!buffer) return; // file not available (placeholder)
-
-    this.sourceNode = this.ctx.createBufferSource();
-    this.sourceNode.buffer = buffer;
-    this.sourceNode.loop = true;
-    this.sourceNode.connect(this.gainNode);
-    this.sourceNode.start();
-    this.currentId = id;
+  private getEffectiveGain(soundId: string | null, volume: number): number {
+    if (!soundId) return 0;
+    // Boost black noise volume so it has rich, powerful sub-bass presence
+    const boost = soundId === 'black-noise' ? 1.6 : 1.0;
+    return volume * AMBIENT_GAIN_SCALE * boost;
   }
 
-  /** Stop the currently playing ambient sound. */
-  stop(): void {
-    if (this.sourceNode) {
-      try {
-        this.sourceNode.stop();
-      } catch {
-        // Already stopped
+  /**
+   * Synchronize active ambient layers with the provided layer configurations.
+   * Dynamically adds, updates, or tears down audio nodes per layer.
+   */
+  async syncLayers(configs: AmbientLayer[]): Promise<void> {
+    const configIds = new Set(configs.map((c) => c.id));
+
+    // 1. Remove layers that no longer exist in configs
+    for (const [id, layer] of this.layers.entries()) {
+      if (!configIds.has(id)) {
+        this.stopLayer(layer);
+        layer.gainNode.disconnect();
+        this.layers.delete(id);
       }
-      this.sourceNode.disconnect();
-      this.sourceNode = null;
     }
-    this.currentId = null;
+
+    // 2. Add or update each layer
+    for (const config of configs) {
+      let layer = this.layers.get(config.id);
+
+      if (!layer) {
+        const gainNode = this.ctx.createGain();
+        gainNode.gain.setValueAtTime(
+          this.getEffectiveGain(config.soundId, config.volume),
+          this.ctx.currentTime,
+        );
+        gainNode.connect(this.destination);
+
+        layer = {
+          layerId: config.id,
+          soundId: config.soundId,
+          volume: config.volume,
+          sourceNode: null,
+          gainNode,
+        };
+        this.layers.set(config.id, layer);
+
+        if (this._isPlaying && config.soundId) {
+          await this.startLayer(layer);
+        }
+      } else {
+        // Update volume smoothly
+        const targetGain = this.getEffectiveGain(config.soundId, config.volume);
+        layer.gainNode.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.02);
+        layer.volume = config.volume;
+
+        // If sound changed on this layer
+        if (layer.soundId !== config.soundId) {
+          this.stopLayer(layer);
+          layer.soundId = config.soundId;
+          if (this._isPlaying && config.soundId) {
+            await this.startLayer(layer);
+          }
+        }
+      }
+    }
   }
 
-  setVolume(v: number): void {
-    this.gainNode.gain.setTargetAtTime(v * AMBIENT_GAIN_SCALE, this.ctx.currentTime, 0.02);
+  private async startLayer(layer: ActiveLayer): Promise<void> {
+    if (!layer.soundId) return;
+
+    this.stopLayer(layer);
+
+    const buffer = await this.getBuffer(layer.soundId);
+    if (!buffer) return;
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(layer.gainNode);
+    source.start();
+    layer.sourceNode = source;
   }
 
-  get output(): GainNode {
-    return this.gainNode;
+  private stopLayer(layer: ActiveLayer): void {
+    if (layer.sourceNode) {
+      try {
+        layer.sourceNode.stop();
+      } catch {
+        // Ignore if already stopped
+      }
+      layer.sourceNode.disconnect();
+      layer.sourceNode = null;
+    }
   }
 
-  get activeId(): string | null {
-    return this.currentId;
+  /** Start playing all active ambient layers that have a selected sound. */
+  async play(): Promise<void> {
+    this._isPlaying = true;
+    for (const layer of this.layers.values()) {
+      if (layer.soundId && !layer.sourceNode) {
+        await this.startLayer(layer);
+      }
+    }
+  }
+
+  /** Stop all ambient sound playback. */
+  stop(): void {
+    this._isPlaying = false;
+    for (const layer of this.layers.values()) {
+      this.stopLayer(layer);
+    }
   }
 
   dispose(): void {
     this.stop();
-    this.gainNode.disconnect();
+    for (const layer of this.layers.values()) {
+      layer.gainNode.disconnect();
+    }
+    this.layers.clear();
     this.bufferCache.clear();
   }
 
-  // ── Internal ──
+  // ── Backward Compatibility Wrappers ──
+
+  async playLegacy(id: string): Promise<void> {
+    await this.syncLayers([{ id: 'default', soundId: id, volume: 0.5 }]);
+    await this.play();
+  }
+
+  setVolume(v: number): void {
+    const defaultLayer = this.layers.get('default') || this.layers.values().next().value;
+    if (defaultLayer) {
+      defaultLayer.gainNode.gain.setTargetAtTime(
+        this.getEffectiveGain(defaultLayer.soundId, v),
+        this.ctx.currentTime,
+        0.02,
+      );
+    }
+  }
+
+  // ── Internal Buffer Loading ──
 
   private async getBuffer(id: string): Promise<AudioBuffer | null> {
-    // Return cached buffer if available
     if (this.bufferCache.has(id)) {
       return this.bufferCache.get(id)!;
     }
 
-    // Generated noise — create programmatically
     if ((GENERATED_NOISE_IDS as readonly string[]).includes(id)) {
       const buffer = this.generateNoise(id);
       this.bufferCache.set(id, buffer);
       return buffer;
     }
 
-    // File-based sound — try to fetch
     const src = this.getFilePath(id);
     if (!src) return null;
 
@@ -113,6 +205,7 @@ export class AmbientPlayer {
       case 'white-noise': return NoiseGenerator.white(this.ctx);
       case 'pink-noise':  return NoiseGenerator.pink(this.ctx);
       case 'brown-noise': return NoiseGenerator.brown(this.ctx);
+      case 'black-noise': return NoiseGenerator.black(this.ctx);
       default: return NoiseGenerator.white(this.ctx);
     }
   }

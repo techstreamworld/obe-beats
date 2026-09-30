@@ -36,31 +36,26 @@ function App() {
       <main className="app-main">
         {/* Left Column: Sound Generation & Levels */}
         <div className="app-column">
-          <section className="panel" aria-labelledby="heading-frequencies">
-            <h2 id="heading-frequencies" className="panel-title">Binaural Frequencies</h2>
+          <section className="panel" aria-label="Binaural Frequencies">
             <FrequencyPanel />
           </section>
 
-          <section className="panel" aria-labelledby="heading-volume">
-            <h2 id="heading-volume" className="panel-title">Volume &amp; Balance</h2>
+          <section className="panel" aria-label="Volume & Balance">
             <VolumePanel />
           </section>
 
-          <section className="panel" aria-labelledby="heading-ambient">
-            <h2 id="heading-ambient" className="panel-title">Ambient Sound</h2>
+          <section className="panel" aria-label="Ambient Sound">
             <AmbientPanel />
           </section>
         </div>
 
         {/* Right Column: Session Runtime & Audio Export */}
         <div className="app-column">
-          <section className="panel" aria-labelledby="heading-timer">
-            <h2 id="heading-timer" className="panel-title">Session Timer</h2>
+          <section className="panel" aria-label="Session Timer">
             <TimerPanel />
           </section>
 
-          <section className="panel" aria-labelledby="heading-export">
-            <h2 id="heading-export" className="panel-title">Audio Export (WAV / MP3)</h2>
+          <section className="panel" aria-label="Audio Export (WAV / MP3)">
             <ExportButton />
           </section>
         </div>

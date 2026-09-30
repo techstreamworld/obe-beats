@@ -20,10 +20,20 @@ export interface EngineParams {
 export interface AmbientSoundEntry {
   /** Unique identifier (e.g. 'rain', 'white-noise'). */
   id: string;
-  /** Human-readable label (e.g. "Rain", "White Noise"). */
+  /** Human-readable label (e.g. "Rain", "White"). */
   label: string;
   /** Group heading in the dropdown. */
   group: 'nature' | 'noise';
+}
+
+/** Represents an active ambient sound layer with its own volume control. */
+export interface AmbientLayer {
+  /** Unique instance identifier for this layer (e.g. 'layer-1'). */
+  id: string;
+  /** Ambient sound ID (e.g. 'rain', 'pink-noise', 'black-noise', or null for None). */
+  soundId: string | null;
+  /** Layer volume (0–1). */
+  volume: number;
 }
 
 // ── Timer & Fades ──
@@ -55,6 +65,4 @@ export interface ExportConfig {
 
 export type ExportStatus = 'idle' | 'rendering' | 'encoding' | 'done' | 'error';
 
-// ── UI / Transport ──
-
-export type PlaybackState = 'stopped' | 'playing';
+export type PlaybackState = 'stopped' | 'playing' | 'paused';

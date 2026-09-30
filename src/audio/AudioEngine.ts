@@ -10,6 +10,7 @@
 import { AmbientPlayer } from './AmbientPlayer.ts';
 import { BinauralNode } from './BinauralNode.ts';
 import { FadeController } from './FadeController.ts';
+import type { AmbientLayer } from '../types/index.ts';
 
 export class AudioEngine {
   private static instance: AudioEngine | null = null;
@@ -25,10 +26,10 @@ export class AudioEngine {
   private masterVol = 0.5;
   private leftVol = 1;
   private rightVol = 1;
-  private _selectedAmbientId: string | null = null;
-  private _ambientVol = 0.5;
+  private _ambientLayers: AmbientLayer[] = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
 
   private _playing = false;
+  private _paused = false;
 
   private constructor() {}
 
@@ -40,9 +41,14 @@ export class AudioEngine {
     return AudioEngine.instance;
   }
 
-  /** True when oscillators are running. */
+  /** True when audio is actively playing and not paused. */
   get isPlaying(): boolean {
-    return this._playing;
+    return this._playing && !this._paused;
+  }
+
+  /** True when audio is currently paused. */
+  get isPaused(): boolean {
+    return this._paused;
   }
 
   // ── Lifecycle ──
@@ -56,7 +62,7 @@ export class AudioEngine {
       this.masterGain.connect(this.ctx.destination);
 
       this.ambientPlayer = new AmbientPlayer(this.ctx, this.masterGain);
-      this.ambientPlayer.setVolume(this._ambientVol);
+      await this.ambientPlayer.syncLayers(this._ambientLayers);
     }
 
     if (this.ctx.state === 'suspended') {
@@ -66,11 +72,19 @@ export class AudioEngine {
     return this.ctx;
   }
 
-  /** Start binaural-beat playback. Idempotent. */
+  /** Start or resume playback. Idempotent. */
   async play(): Promise<void> {
-    if (this._playing) return;
+    if (this._playing && !this._paused) return;
 
     const ctx = await this.ensureContext();
+
+    if (this._paused) {
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+      this._paused = false;
+      return;
+    }
 
     this.binauralNode = new BinauralNode(ctx, this.carrierFreq, this.beatFreq);
     this.binauralNode.setLeftVolume(this.leftVol);
@@ -78,22 +92,49 @@ export class AudioEngine {
     this.binauralNode.output.connect(this.masterGain!);
     this.binauralNode.start();
 
-    // Start ambient if one is selected
-    if (this._selectedAmbientId) {
-      await this.ambientPlayer!.play(this._selectedAmbientId);
+    // Start all active ambient layers
+    if (this.ambientPlayer) {
+      await this.ambientPlayer.play();
     }
 
     this._playing = true;
+    this._paused = false;
+  }
+
+  /** Pause playback without disposing the audio nodes. */
+  async pause(): Promise<void> {
+    if (!this._playing || this._paused) return;
+    if (this.ctx && this.ctx.state === 'running') {
+      await this.ctx.suspend();
+    }
+    this._paused = true;
   }
 
   /** Stop playback and tear down oscillators. */
   stop(): void {
-    if (!this._playing) return;
+    if (!this._playing && !this._paused) return;
 
     this.binauralNode?.dispose();
     this.binauralNode = null;
     this.ambientPlayer?.stop();
     this._playing = false;
+    this._paused = false;
+
+    // Reset master gain back to masterVol so future playback begins at normal level
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(this.masterVol, this.ctx.currentTime);
+    }
+
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
+  /** Restart playback from the beginning. */
+  async restart(): Promise<void> {
+    this.stop();
+    await this.play();
   }
 
   /** Close the AudioContext entirely. Resets the singleton. */
@@ -142,21 +183,27 @@ export class AudioEngine {
 
   // ── Ambient ──
 
-  /** Switch the ambient sound. Pass null to disable ambient. */
-  async setAmbient(id: string | null): Promise<void> {
-    this._selectedAmbientId = id;
-    if (!this._playing || !this.ambientPlayer) return;
-
-    if (id) {
-      await this.ambientPlayer.play(id);
-    } else {
-      this.ambientPlayer.stop();
+  /** Set active ambient sound layers (multi-layer support). */
+  async setAmbientLayers(layers: AmbientLayer[]): Promise<void> {
+    this._ambientLayers = layers;
+    if (this.ambientPlayer) {
+      await this.ambientPlayer.syncLayers(layers);
     }
   }
 
+  /** Switch the ambient sound on the primary layer. Pass null to disable ambient. */
+  async setAmbient(id: string | null): Promise<void> {
+    const updated = this._ambientLayers.length > 0
+      ? [{ ...this._ambientLayers[0], soundId: id }, ...this._ambientLayers.slice(1)]
+      : [{ id: 'layer-1', soundId: id, volume: 0.5 }];
+    await this.setAmbientLayers(updated);
+  }
+
   setAmbientVolume(v: number): void {
-    this._ambientVol = v;
-    this.ambientPlayer?.setVolume(v);
+    const updated = this._ambientLayers.length > 0
+      ? [{ ...this._ambientLayers[0], volume: v }, ...this._ambientLayers.slice(1)]
+      : [{ id: 'layer-1', soundId: null, volume: v }];
+    this.setAmbientLayers(updated);
   }
 
   // ── Fade helpers ──

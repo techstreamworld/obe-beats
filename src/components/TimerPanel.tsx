@@ -28,7 +28,7 @@ export function TimerPanel() {
       {/* Countdown and Session Duration row (Max 3 hours / 180 min) */}
       <div className="timer-header-row">
         <div className="countdown" aria-live="polite" aria-label="Time remaining">
-          {timerState.isRunning
+          {timerState.remainingSeconds > 0
             ? formatTime(timerState.remainingSeconds)
             : timerDuration > 0
               ? formatTime(timerDuration)

@@ -13,14 +13,15 @@ export function useAudioEngine(): void {
   const masterVolume = useAppStore((s) => s.masterVolume);
   const leftVolume = useAppStore((s) => s.leftVolume);
   const rightVolume = useAppStore((s) => s.rightVolume);
-  const selectedAmbientId = useAppStore((s) => s.selectedAmbientId);
-  const ambientVolume = useAppStore((s) => s.ambientVolume);
+  const ambientLayers = useAppStore((s) => s.ambientLayers);
 
   // ── Sync playback state ──
   useEffect(() => {
     const engine = AudioEngine.getInstance();
     if (playback === 'playing') {
       engine.play();
+    } else if (playback === 'paused') {
+      engine.pause();
     } else {
       engine.stop();
     }
@@ -48,12 +49,8 @@ export function useAudioEngine(): void {
     AudioEngine.getInstance().setRightVolume(rightVolume);
   }, [rightVolume]);
 
-  // ── Sync ambient ──
+  // ── Sync ambient layers ──
   useEffect(() => {
-    AudioEngine.getInstance().setAmbient(selectedAmbientId);
-  }, [selectedAmbientId]);
-
-  useEffect(() => {
-    AudioEngine.getInstance().setAmbientVolume(ambientVolume);
-  }, [ambientVolume]);
+    AudioEngine.getInstance().setAmbientLayers(ambientLayers);
+  }, [ambientLayers]);
 }

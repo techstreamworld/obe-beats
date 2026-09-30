@@ -53,12 +53,36 @@ export class TimerController {
     this.onTick(this.remaining);
   }
 
+  /** Pause the countdown interval without wiping remaining seconds. */
+  pause(): void {
+    if (this.intervalId !== null) {
+      window.clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  /** Resume countdown from current remaining seconds. */
+  resume(): void {
+    if (this.intervalId !== null || this.remaining <= 0) return;
+
+    this.intervalId = window.setInterval(() => {
+      this.remaining = Math.max(0, this.remaining - 1);
+      this.onTick(this.remaining);
+
+      if (this.remaining <= 0) {
+        this.stop();
+        this.onExpiry();
+      }
+    }, 1000);
+  }
+
   /** Stop the countdown and clear the interval. */
   stop(): void {
     if (this.intervalId !== null) {
       window.clearInterval(this.intervalId);
       this.intervalId = null;
     }
+    this.remaining = 0;
   }
 
   get isRunning(): boolean {

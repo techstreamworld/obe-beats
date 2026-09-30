@@ -5,6 +5,7 @@
 import { Mp3Encoder } from '@breezystack/lamejs';
 import { AMBIENT_GAIN_SCALE } from './AmbientPlayer.ts';
 import { NoiseGenerator } from './NoiseGenerator.ts';
+import type { AmbientLayer } from '../types/index.ts';
 
 export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
 
@@ -14,8 +15,9 @@ export interface RenderOptions {
   masterVolume: number;
   leftVolume: number;
   rightVolume: number;
-  ambientId: string | null;
-  ambientVolume: number;
+  ambientId?: string | null;
+  ambientVolume?: number;
+  ambientLayers?: AmbientLayer[];
   durationSeconds: number;
   fadeInSeconds: number;
   fadeOutSeconds: number;
@@ -126,14 +128,22 @@ export class WavExporter {
     rightOsc.start(0);
     rightOsc.stop(duration);
 
-    // ── Ambient Sound (if selected) with default attenuation ──
-    if (options.ambientId) {
+    // ── Ambient Sounds (multi-layer support) with default attenuation ──
+    const layersToRender: AmbientLayer[] =
+      options.ambientLayers && options.ambientLayers.length > 0
+        ? options.ambientLayers
+        : options.ambientId
+          ? [{ id: 'default', soundId: options.ambientId, volume: options.ambientVolume ?? 0.5 }]
+          : [];
+
+    for (const layer of layersToRender) {
+      if (!layer.soundId) continue;
+      const boost = layer.soundId === 'black-noise' ? 1.6 : 1.0;
       const ambientGain = offlineCtx.createGain();
-      // Apply AMBIENT_GAIN_SCALE so ambient is appropriately quiet by default
-      ambientGain.gain.setValueAtTime(options.ambientVolume * AMBIENT_GAIN_SCALE, 0);
+      ambientGain.gain.setValueAtTime(layer.volume * AMBIENT_GAIN_SCALE * boost, 0);
       ambientGain.connect(masterGain);
 
-      const ambientBuffer = await this.getAmbientBuffer(offlineCtx, options.ambientId);
+      const ambientBuffer = await this.getAmbientBuffer(offlineCtx, layer.soundId);
       if (ambientBuffer) {
         const ambientSource = offlineCtx.createBufferSource();
         ambientSource.buffer = ambientBuffer;
@@ -201,11 +211,13 @@ export class WavExporter {
   ): Promise<AudioBuffer | null> {
     switch (id) {
       case 'white-noise':
-        return NoiseGenerator.white(ctx, 4);
+        return NoiseGenerator.white(ctx, 6);
       case 'pink-noise':
-        return NoiseGenerator.pink(ctx, 4);
+        return NoiseGenerator.pink(ctx, 6);
       case 'brown-noise':
-        return NoiseGenerator.brown(ctx, 4);
+        return NoiseGenerator.brown(ctx, 6);
+      case 'black-noise':
+        return NoiseGenerator.black(ctx, 6);
       default: {
         const pathMap: Record<string, string> = {
           rain: '/ambient/rain.mp3',

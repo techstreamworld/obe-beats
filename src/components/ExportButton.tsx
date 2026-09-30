@@ -13,8 +13,7 @@ export function ExportButton() {
   const masterVolume = useAppStore((s) => s.masterVolume);
   const leftVolume = useAppStore((s) => s.leftVolume);
   const rightVolume = useAppStore((s) => s.rightVolume);
-  const selectedAmbientId = useAppStore((s) => s.selectedAmbientId);
-  const ambientVolume = useAppStore((s) => s.ambientVolume);
+  const ambientLayers = useAppStore((s) => s.ambientLayers);
   const fadeInSeconds = useAppStore((s) => s.fadeInSeconds);
   const fadeOutSeconds = useAppStore((s) => s.fadeOutSeconds);
   const timerDurationSeconds = useAppStore((s) => s.timerDurationSeconds);
@@ -37,8 +36,7 @@ export function ExportButton() {
           masterVolume,
           leftVolume,
           rightVolume,
-          ambientId: selectedAmbientId,
-          ambientVolume,
+          ambientLayers,
           durationSeconds: exportDuration,
           fadeInSeconds,
           fadeOutSeconds,

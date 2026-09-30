@@ -6,23 +6,25 @@ import './AmbientPanel.css';
 /** Catalogue matching the user's dropdown design. */
 const AMBIENT_CATALOGUE: AmbientSoundEntry[] = [
   // Nature Sounds (file-based — placeholder until audio files are provided)
-  { id: 'rain',         label: 'Rain',         group: 'nature' },
-  { id: 'forest-rain',  label: 'Forest Rain',  group: 'nature' },
-  { id: 'ocean-waves',  label: 'Ocean Waves',  group: 'nature' },
-  // Noise Colors (generated in code)
-  { id: 'white-noise',  label: 'White Noise',  group: 'noise' },
-  { id: 'pink-noise',   label: 'Pink Noise',   group: 'noise' },
-  { id: 'brown-noise',  label: 'Brown Noise',  group: 'noise' },
+  { id: 'rain',        label: 'Rain',        group: 'nature' },
+  { id: 'forest-rain', label: 'Forest Rain', group: 'nature' },
+  { id: 'ocean-waves', label: 'Ocean Waves', group: 'nature' },
+  // Noise (generated in code)
+  { id: 'white-noise', label: 'White',       group: 'noise' },
+  { id: 'pink-noise',  label: 'Pink',        group: 'noise' },
+  { id: 'brown-noise', label: 'Brown',       group: 'noise' },
+  { id: 'black-noise', label: 'Black',       group: 'noise' },
 ];
 
 const natureSounds = AMBIENT_CATALOGUE.filter((s) => s.group === 'nature');
-const noiseColors  = AMBIENT_CATALOGUE.filter((s) => s.group === 'noise');
+const noiseSounds  = AMBIENT_CATALOGUE.filter((s) => s.group === 'noise');
 
 export function AmbientPanel() {
-  const selectedId = useAppStore((s) => s.selectedAmbientId);
-  const ambientVolume = useAppStore((s) => s.ambientVolume);
-  const setSelected = useAppStore((s) => s.setSelectedAmbient);
-  const setVolume = useAppStore((s) => s.setAmbientVolume);
+  const ambientLayers = useAppStore((s) => s.ambientLayers);
+  const setAmbientLayerSound = useAppStore((s) => s.setAmbientLayerSound);
+  const setAmbientLayerVolume = useAppStore((s) => s.setAmbientLayerVolume);
+  const addAmbientLayer = useAppStore((s) => s.addAmbientLayer);
+  const removeAmbientLayer = useAppStore((s) => s.removeAmbientLayer);
 
   const parsePercent = (str: string) => {
     const num = parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -32,56 +34,88 @@ export function AmbientPanel() {
 
   return (
     <div className="ambient-panel">
-      {/* Dropdown */}
-      <div className="control-row">
-        <label htmlFor="ambient-select">Ambient Sound</label>
-        <select
-          id="ambient-select"
-          className="ambient-select"
-          value={selectedId ?? ''}
-          onChange={(e) => setSelected(e.target.value || null)}
-        >
-          <optgroup label="No Ambient">
-            <option value="">No Ambient</option>
-          </optgroup>
-          <optgroup label="Nature Sounds">
-            {natureSounds.map((s) => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </optgroup>
-          <optgroup label="Noise Colors">
-            {noiseColors.map((s) => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </optgroup>
-        </select>
-      </div>
+      {ambientLayers.map((layer, index) => {
+        const isSelected = Boolean(layer.soundId);
+        const layerTitle = ambientLayers.length > 1 ? `Ambient Sound ${index + 1}` : 'Ambient Sound';
 
-      {/* Volume (only shown when an ambient is selected) */}
-      {selectedId && (
-        <div className="control-row">
-          <label htmlFor="ambient-volume">Ambient Volume</label>
-          <div className="slider-group">
-            <input
-              id="ambient-volume"
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={ambientVolume}
-              onChange={(e) => setVolume(Number(e.target.value))}
-            />
-            <CommitInput
-              value={ambientVolume}
-              min={0}
-              max={1}
-              formatDisplay={(v) => `${Math.round(v * 100)}%`}
-              parseInput={parsePercent}
-              onCommit={(v) => setVolume(v)}
-              ariaLabel="Ambient volume percentage. Type value and press Enter."
-            />
+        return (
+          <div key={layer.id} className="ambient-layer-row">
+            {/* Dropdown Row */}
+            <div className="control-row">
+              <div className="ambient-layer-header">
+                <label htmlFor={`ambient-select-${layer.id}`}>{layerTitle}</label>
+                {ambientLayers.length > 1 && (
+                  <button
+                    type="button"
+                    className="remove-layer-btn"
+                    onClick={() => removeAmbientLayer(layer.id)}
+                    title="Remove ambient layer"
+                    aria-label={`Remove ${layerTitle}`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              <select
+                id={`ambient-select-${layer.id}`}
+                className="ambient-select"
+                value={layer.soundId ?? ''}
+                onChange={(e) => setAmbientLayerSound(layer.id, e.target.value || null)}
+              >
+                <option value="">None</option>
+                <optgroup label="Nature Sounds">
+                  {natureSounds.map((s) => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Noise">
+                  {noiseSounds.map((s) => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
+
+            {/* Volume (only shown when an ambient sound is selected for this layer) */}
+            {isSelected && (
+              <div className="control-row ambient-volume-row">
+                <label htmlFor={`ambient-volume-${layer.id}`}>
+                  {ambientLayers.length > 1 ? `Sound ${index + 1} Volume` : 'Ambient Volume'}
+                </label>
+                <div className="slider-group">
+                  <input
+                    id={`ambient-volume-${layer.id}`}
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={layer.volume}
+                    onChange={(e) => setAmbientLayerVolume(layer.id, Number(e.target.value))}
+                  />
+                  <CommitInput
+                    value={layer.volume}
+                    min={0}
+                    max={1}
+                    formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                    parseInput={parsePercent}
+                    onCommit={(v) => setAmbientLayerVolume(layer.id, v)}
+                    ariaLabel={`${layerTitle} volume percentage. Type value and press Enter.`}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        );
+      })}
+
+      {ambientLayers.length < 8 && (
+        <button
+          type="button"
+          className="add-layer-btn"
+          onClick={addAmbientLayer}
+        >
+          + Add Ambient Sound
+        </button>
       )}
     </div>
   );
