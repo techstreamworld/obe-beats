@@ -63,6 +63,8 @@ export interface ExportConfig {
   sampleRate: number;
 }
 
+export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
+
 export type ExportStatus = 'idle' | 'rendering' | 'encoding' | 'done' | 'error';
 
 export type PlaybackState = 'stopped' | 'playing' | 'paused';

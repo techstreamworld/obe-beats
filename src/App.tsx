@@ -1,6 +1,7 @@
 import { useAudioEngine } from './hooks/useAudioEngine.ts'
 import { useTimer } from './hooks/useTimer.ts'
 import { TransportBar } from './components/TransportBar.tsx'
+import { PresetBar } from './components/PresetBar.tsx'
 import { FrequencyPanel } from './components/FrequencyPanel.tsx'
 import { VolumePanel } from './components/VolumePanel.tsx'
 import { TimerPanel } from './components/TimerPanel.tsx'
@@ -33,6 +34,9 @@ function App() {
           <BlackScreen />
         </div>
       </header>
+
+      {/* Quick Visual Presets Bar */}
+      <PresetBar />
 
       <main className="app-main">
         {/* Left Column: Sound Generation & Levels */}

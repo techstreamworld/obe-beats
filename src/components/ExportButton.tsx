@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { WavExporter, type ExportFormat } from '../audio/WavExporter.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './ExportButton.css';
 
 export function ExportButton() {
-  const [exportFormat, setExportFormat] = useState<ExportFormat>('wav');
+  const exportFormat = useAppStore((s) => s.exportFormat);
+  const setExportFormat = useAppStore((s) => s.setExportFormat);
   const exportStatus = useAppStore((s) => s.exportStatus);
   const setExportStatus = useAppStore((s) => s.setExportStatus);
 

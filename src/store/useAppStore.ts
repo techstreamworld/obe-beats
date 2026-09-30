@@ -1,6 +1,8 @@
 import { create } from 'zustand';
+import { PRESETS } from '../constants/presets.ts';
 import type {
   AmbientLayer,
+  ExportFormat,
   ExportStatus,
   IntervalTone,
   PlaybackState,
@@ -26,7 +28,9 @@ const DEFAULT_STATE = {
   intervalMinutes: 0,
   intervalVolume: 0.5,
   isIntervalPreviewing: false,
+  exportFormat: 'wav' as ExportFormat,
   exportStatus: 'idle' as ExportStatus,
+  activePresetId: null as string | null,
 };
 
 // ── Store shape ──
@@ -40,6 +44,10 @@ export interface AppState {
   stop: () => void;
   restart: () => void;
   resetAll: () => void;
+
+  // Presets
+  activePresetId: string | null;
+  applyPreset: (presetId: string) => void;
 
   // Frequencies
   carrierFrequency: number;
@@ -89,6 +97,8 @@ export interface AppState {
   setAmbientVolume: (v: number) => void;
 
   // Export
+  exportFormat: ExportFormat;
+  setExportFormat: (format: ExportFormat) => void;
   exportStatus: ExportStatus;
   setExportStatus: (status: ExportStatus) => void;
 }
@@ -106,24 +116,53 @@ export const useAppStore = create<AppState>((set, get) => ({
     return get().ambientLayers[0]?.volume ?? 0.5;
   },
 
+  // Presets action
+  applyPreset: (presetId: string) => {
+    const preset = PRESETS.find((p) => p.id === presetId);
+    if (!preset) return;
+    set((state) => ({
+      activePresetId: preset.id,
+      carrierFrequency: preset.carrierFrequency,
+      beatFrequency: preset.beatFrequency,
+      masterVolume: preset.masterVolume,
+      leftVolume: preset.leftVolume,
+      rightVolume: preset.rightVolume,
+      timerDurationSeconds: preset.timerDurationSeconds,
+      timerState: {
+        remainingSeconds: preset.timerDurationSeconds,
+        isRunning: state.playback === 'playing',
+      },
+      ambientLayers: preset.ambientLayers,
+      intervalTone: preset.intervalTone,
+      intervalMinutes: preset.intervalMinutes,
+      intervalVolume: preset.intervalVolume,
+      exportFormat: preset.exportFormat,
+    }));
+  },
+
   // Transport actions
   play: () => set({ playback: 'playing' }),
   pause: () => set({ playback: 'paused' }),
   stop: () => set({ playback: 'stopped' }),
   restart: () => set((state) => ({ playback: 'playing', restartKey: state.restartKey + 1 })),
-  resetAll: () => set({ ...DEFAULT_STATE, ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }] }),
+  resetAll: () =>
+    set({
+      ...DEFAULT_STATE,
+      ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
+      activePresetId: null,
+    }),
 
   // Frequencies
-  setCarrierFrequency: (hz) => set({ carrierFrequency: hz }),
-  setBeatFrequency: (hz) => set({ beatFrequency: hz }),
+  setCarrierFrequency: (hz) => set({ carrierFrequency: hz, activePresetId: null }),
+  setBeatFrequency: (hz) => set({ beatFrequency: hz, activePresetId: null }),
 
   // Volumes
   setMasterVolume: (v) => set({ masterVolume: v }),
-  setLeftVolume: (v) => set({ leftVolume: v }),
-  setRightVolume: (v) => set({ rightVolume: v }),
+  setLeftVolume: (v) => set({ leftVolume: v, activePresetId: null }),
+  setRightVolume: (v) => set({ rightVolume: v, activePresetId: null }),
 
   // Timer & fades
-  setTimerDuration: (s) => set({ timerDurationSeconds: s }),
+  setTimerDuration: (s) => set({ timerDurationSeconds: s, activePresetId: null }),
   setFadeIn: (s) => set({ fadeInSeconds: s }),
   setFadeOut: (s) => set({ fadeOutSeconds: s }),
   updateTimerState: (partial) =>
@@ -132,6 +171,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Ambient sound multi-layer actions
   setAmbientLayerSound: (layerId: string, soundId: string | null) =>
     set((state) => ({
+      activePresetId: null,
       ambientLayers: state.ambientLayers.map((l) =>
         l.id === layerId ? { ...l, soundId } : l,
       ),
@@ -144,6 +184,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
   addAmbientLayer: () =>
     set((state) => ({
+      activePresetId: null,
       ambientLayers: [
         ...state.ambientLayers,
         {
@@ -155,6 +196,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
   removeAmbientLayer: (layerId: string) =>
     set((state) => ({
+      activePresetId: null,
       ambientLayers:
         state.ambientLayers.length > 1
           ? state.ambientLayers.filter((l) => l.id !== layerId)
@@ -162,14 +204,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   // Interval Audio Layer actions
-  setIntervalTone: (tone) => set({ intervalTone: tone }),
-  setIntervalMinutes: (min) => set({ intervalMinutes: min }),
+  setIntervalTone: (tone) => set({ intervalTone: tone, activePresetId: null }),
+  setIntervalMinutes: (min) => set({ intervalMinutes: min, activePresetId: null }),
   setIntervalVolume: (v) => set({ intervalVolume: v }),
   setIsIntervalPreviewing: (previewing) => set({ isIntervalPreviewing: previewing }),
 
   // Legacy ambient compatibility
   setSelectedAmbient: (id: string | null) =>
     set((state) => ({
+      activePresetId: null,
       ambientLayers: state.ambientLayers.length > 0
         ? [{ ...state.ambientLayers[0], soundId: id }, ...state.ambientLayers.slice(1)]
         : [{ id: 'layer-1', soundId: id, volume: 0.5 }],
@@ -180,5 +223,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   // Export
+  setExportFormat: (format) => set({ exportFormat: format }),
   setExportStatus: (status) => set({ exportStatus: status }),
 }));
