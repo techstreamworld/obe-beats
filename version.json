@@ -1,4 +1,4 @@
 {
-  "version": 61,
-  "lastUpdate": "Multi-layer ambient sound with independent volumes, black noise volume boost, single None option, and carrier frequency readout cleanup"
+  "version": 65,
+  "lastUpdate": "Seamless 12s buffer loop with steady-state filter pre-roll and equal-power crossfading for all 4 noises"
 }

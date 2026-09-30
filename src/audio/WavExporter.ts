@@ -211,13 +211,13 @@ export class WavExporter {
   ): Promise<AudioBuffer | null> {
     switch (id) {
       case 'white-noise':
-        return NoiseGenerator.white(ctx, 6);
+        return NoiseGenerator.white(ctx, 12);
       case 'pink-noise':
-        return NoiseGenerator.pink(ctx, 6);
+        return NoiseGenerator.pink(ctx, 12);
       case 'brown-noise':
-        return NoiseGenerator.brown(ctx, 6);
+        return NoiseGenerator.brown(ctx, 12);
       case 'black-noise':
-        return NoiseGenerator.black(ctx, 6);
+        return NoiseGenerator.black(ctx, 12);
       default: {
         const pathMap: Record<string, string> = {
           rain: '/ambient/rain.mp3',
