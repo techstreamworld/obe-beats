@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type {
   AmbientLayer,
   ExportStatus,
+  IntervalTone,
   PlaybackState,
   TimerState,
 } from '../types';
@@ -21,6 +22,10 @@ const DEFAULT_STATE = {
   fadeOutSeconds: 3,
   timerState: { remainingSeconds: 0, isRunning: false },
   ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }] as AmbientLayer[],
+  intervalTone: 'bell' as IntervalTone,
+  intervalMinutes: 0,
+  intervalVolume: 0.5,
+  isIntervalPreviewing: false,
   exportStatus: 'idle' as ExportStatus,
 };
 
@@ -66,6 +71,16 @@ export interface AppState {
   setAmbientLayerVolume: (layerId: string, volume: number) => void;
   addAmbientLayer: () => void;
   removeAmbientLayer: (layerId: string) => void;
+
+  // Interval Audio Layer
+  intervalTone: IntervalTone;
+  intervalMinutes: number;
+  intervalVolume: number;
+  isIntervalPreviewing: boolean;
+  setIntervalTone: (tone: IntervalTone) => void;
+  setIntervalMinutes: (minutes: number) => void;
+  setIntervalVolume: (v: number) => void;
+  setIsIntervalPreviewing: (previewing: boolean) => void;
 
   // Legacy ambient compatibility
   selectedAmbientId: string | null;
@@ -145,6 +160,12 @@ export const useAppStore = create<AppState>((set, get) => ({
           ? state.ambientLayers.filter((l) => l.id !== layerId)
           : [{ id: 'layer-1', soundId: null, volume: 0.5 }],
     })),
+
+  // Interval Audio Layer actions
+  setIntervalTone: (tone) => set({ intervalTone: tone }),
+  setIntervalMinutes: (min) => set({ intervalMinutes: min }),
+  setIntervalVolume: (v) => set({ intervalVolume: v }),
+  setIsIntervalPreviewing: (previewing) => set({ isIntervalPreviewing: previewing }),
 
   // Legacy ambient compatibility
   setSelectedAmbient: (id: string | null) =>

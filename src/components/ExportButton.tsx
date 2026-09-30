@@ -14,6 +14,9 @@ export function ExportButton() {
   const leftVolume = useAppStore((s) => s.leftVolume);
   const rightVolume = useAppStore((s) => s.rightVolume);
   const ambientLayers = useAppStore((s) => s.ambientLayers);
+  const intervalTone = useAppStore((s) => s.intervalTone);
+  const intervalMinutes = useAppStore((s) => s.intervalMinutes);
+  const intervalVolume = useAppStore((s) => s.intervalVolume);
   const fadeInSeconds = useAppStore((s) => s.fadeInSeconds);
   const fadeOutSeconds = useAppStore((s) => s.fadeOutSeconds);
   const timerDurationSeconds = useAppStore((s) => s.timerDurationSeconds);
@@ -37,6 +40,9 @@ export function ExportButton() {
           leftVolume,
           rightVolume,
           ambientLayers,
+          intervalTone,
+          intervalMinutes,
+          intervalVolume,
           durationSeconds: exportDuration,
           fadeInSeconds,
           fadeOutSeconds,

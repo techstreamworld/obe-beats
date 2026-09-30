@@ -4,13 +4,14 @@
 //
 // Graph:
 //   BinauralNode (stereo) ──┐
-//                           ├──► masterGain → destination
-//   AmbientPlayer (loop) ──┘
+//   AmbientPlayer (loop) ───┼──► masterGain → destination
+//   IntervalPlayer ─────────┘
 
 import { AmbientPlayer } from './AmbientPlayer.ts';
 import { BinauralNode } from './BinauralNode.ts';
 import { FadeController } from './FadeController.ts';
-import type { AmbientLayer } from '../types/index.ts';
+import { IntervalPlayer } from './IntervalPlayer.ts';
+import type { AmbientLayer, IntervalTone } from '../types/index.ts';
 
 export class AudioEngine {
   private static instance: AudioEngine | null = null;
@@ -18,6 +19,7 @@ export class AudioEngine {
   private ctx: AudioContext | null = null;
   private binauralNode: BinauralNode | null = null;
   private ambientPlayer: AmbientPlayer | null = null;
+  private intervalPlayer: IntervalPlayer | null = null;
   private masterGain: GainNode | null = null;
 
   // Stored params (applied to nodes when they exist)
@@ -27,6 +29,12 @@ export class AudioEngine {
   private leftVol = 1;
   private rightVol = 1;
   private _ambientLayers: AmbientLayer[] = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
+
+  // Interval tone configuration
+  private intervalTone: IntervalTone = 'bell';
+  private intervalMinutes = 0;
+  private intervalVolume = 0.5;
+  private previewChangeCallback?: (previewing: boolean) => void;
 
   private _playing = false;
   private _paused = false;
@@ -63,6 +71,12 @@ export class AudioEngine {
 
       this.ambientPlayer = new AmbientPlayer(this.ctx, this.masterGain);
       await this.ambientPlayer.syncLayers(this._ambientLayers);
+
+      this.intervalPlayer = new IntervalPlayer(this.ctx, this.masterGain);
+      this.intervalPlayer.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume);
+      if (this.previewChangeCallback) {
+        this.intervalPlayer.onPreviewChange(this.previewChangeCallback);
+      }
     }
 
     if (this.ctx.state === 'suspended') {
@@ -82,6 +96,7 @@ export class AudioEngine {
       if (ctx.state === 'suspended') {
         await ctx.resume();
       }
+      this.intervalPlayer?.play();
       this._paused = false;
       return;
     }
@@ -92,10 +107,11 @@ export class AudioEngine {
     this.binauralNode.output.connect(this.masterGain!);
     this.binauralNode.start();
 
-    // Start all active ambient layers
+    // Start ambient & interval playback
     if (this.ambientPlayer) {
       await this.ambientPlayer.play();
     }
+    this.intervalPlayer?.play();
 
     this._playing = true;
     this._paused = false;
@@ -104,6 +120,7 @@ export class AudioEngine {
   /** Pause playback without disposing the audio nodes. */
   async pause(): Promise<void> {
     if (!this._playing || this._paused) return;
+    this.intervalPlayer?.pause();
     if (this.ctx && this.ctx.state === 'running') {
       await this.ctx.suspend();
     }
@@ -117,6 +134,7 @@ export class AudioEngine {
     this.binauralNode?.dispose();
     this.binauralNode = null;
     this.ambientPlayer?.stop();
+    this.intervalPlayer?.stop();
     this._playing = false;
     this._paused = false;
 
@@ -142,6 +160,8 @@ export class AudioEngine {
     this.stop();
     this.ambientPlayer?.dispose();
     this.ambientPlayer = null;
+    this.intervalPlayer?.dispose();
+    this.intervalPlayer = null;
     if (this.ctx) {
       await this.ctx.close();
       this.ctx = null;
@@ -204,6 +224,32 @@ export class AudioEngine {
       ? [{ ...this._ambientLayers[0], volume: v }, ...this._ambientLayers.slice(1)]
       : [{ id: 'layer-1', soundId: null, volume: v }];
     this.setAmbientLayers(updated);
+  }
+
+  // ── Interval Audio Layer ──
+
+  setIntervalConfig(tone: IntervalTone, intervalMinutes: number, volume: number): void {
+    this.intervalTone = tone;
+    this.intervalMinutes = intervalMinutes;
+    this.intervalVolume = volume;
+    this.intervalPlayer?.setConfig(tone, intervalMinutes, volume);
+  }
+
+  onIntervalPreviewChange(cb: (previewing: boolean) => void): void {
+    this.previewChangeCallback = cb;
+    this.intervalPlayer?.onPreviewChange(cb);
+  }
+
+  async previewInterval(tone?: IntervalTone, volume?: number): Promise<void> {
+    await this.ensureContext();
+    if (tone) this.intervalTone = tone;
+    if (volume !== undefined) this.intervalVolume = volume;
+    this.intervalPlayer?.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume);
+    await this.intervalPlayer?.startPreview();
+  }
+
+  stopIntervalPreview(): void {
+    this.intervalPlayer?.stopPreview();
   }
 
   // ── Fade helpers ──

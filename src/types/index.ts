@@ -66,3 +66,16 @@ export interface ExportConfig {
 export type ExportStatus = 'idle' | 'rendering' | 'encoding' | 'done' | 'error';
 
 export type PlaybackState = 'stopped' | 'playing' | 'paused';
+
+// ── Interval Audio Layer ──
+
+export type IntervalTone = 'bell' | 'chime' | 'beep';
+
+export interface IntervalConfig {
+  /** Selected interval tone: 'bell' | 'chime' | 'beep' */
+  tone: IntervalTone;
+  /** Interval in minutes (5 to 90 in 5-min increments, 0 = Off) */
+  intervalMinutes: number;
+  /** Volume of the interval tone layer (0 to 1) */
+  volume: number;
+}

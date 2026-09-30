@@ -4,6 +4,7 @@ import { TransportBar } from './components/TransportBar.tsx'
 import { FrequencyPanel } from './components/FrequencyPanel.tsx'
 import { VolumePanel } from './components/VolumePanel.tsx'
 import { TimerPanel } from './components/TimerPanel.tsx'
+import { IntervalPanel } from './components/IntervalPanel.tsx'
 import { AmbientPanel } from './components/AmbientPanel.tsx'
 import { ExportButton } from './components/ExportButton.tsx'
 import { VersionBar } from './components/VersionBar.tsx'
@@ -49,10 +50,14 @@ function App() {
           </section>
         </div>
 
-        {/* Right Column: Session Runtime & Audio Export */}
+        {/* Right Column: Session Runtime, Interval & Audio Export */}
         <div className="app-column">
           <section className="panel" aria-label="Session Timer">
             <TimerPanel />
+          </section>
+
+          <section className="panel" aria-label="Interval Sound">
+            <IntervalPanel />
           </section>
 
           <section className="panel" aria-label="Audio Export (WAV / MP3)">

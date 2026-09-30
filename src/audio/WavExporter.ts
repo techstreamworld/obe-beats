@@ -5,7 +5,8 @@
 import { Mp3Encoder } from '@breezystack/lamejs';
 import { AMBIENT_GAIN_SCALE } from './AmbientPlayer.ts';
 import { NoiseGenerator } from './NoiseGenerator.ts';
-import type { AmbientLayer } from '../types/index.ts';
+import { IntervalSynthesizer } from './IntervalSynthesizer.ts';
+import type { AmbientLayer, IntervalTone } from '../types/index.ts';
 
 export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
 
@@ -18,6 +19,9 @@ export interface RenderOptions {
   ambientId?: string | null;
   ambientVolume?: number;
   ambientLayers?: AmbientLayer[];
+  intervalTone?: IntervalTone;
+  intervalMinutes?: number;
+  intervalVolume?: number;
   durationSeconds: number;
   fadeInSeconds: number;
   fadeOutSeconds: number;
@@ -151,6 +155,41 @@ export class WavExporter {
         ambientSource.connect(ambientGain);
         ambientSource.start(0);
         ambientSource.stop(duration);
+      }
+    }
+
+    // ── Interval Audio Layer (offline render) ──
+    if (
+      options.intervalTone &&
+      options.intervalMinutes &&
+      options.intervalMinutes > 0 &&
+      (options.intervalVolume ?? 0) > 0
+    ) {
+      const intervalSec = options.intervalMinutes * 60;
+      const intervalBuffer = IntervalSynthesizer.getBuffer(offlineCtx, options.intervalTone);
+      const toneDuration = intervalBuffer.duration;
+      const pauseSec = 2.0;
+      const strikeInterval = toneDuration + pauseSec;
+      const multipliers = [0.40, 0.70, 1.00];
+      const baseVol = options.intervalVolume ?? 0.5;
+
+      let triggerTime = intervalSec;
+      while (triggerTime < duration) {
+        for (let i = 0; i < multipliers.length; i++) {
+          const strikeTime = triggerTime + i * strikeInterval;
+          if (strikeTime < duration) {
+            const strikeGain = offlineCtx.createGain();
+            strikeGain.gain.setValueAtTime(baseVol * multipliers[i], strikeTime);
+            strikeGain.connect(masterGain);
+
+            const source = offlineCtx.createBufferSource();
+            source.buffer = intervalBuffer;
+            source.connect(strikeGain);
+            source.start(strikeTime);
+            source.stop(Math.min(duration, strikeTime + toneDuration));
+          }
+        }
+        triggerTime += intervalSec;
       }
     }
 
