@@ -71,12 +71,12 @@ export type PlaybackState = 'stopped' | 'playing' | 'paused';
 
 // ── Interval Audio Layer ──
 
-export type IntervalTone = 'bell' | 'chime' | 'beep' | 'bounce';
+export type IntervalTone = 'bell' | 'chime' | 'beep' | 'waves';
 
 export interface IntervalConfig {
   /** Whether the interval tone layer is enabled */
   enabled: boolean;
-  /** Selected interval tone: 'bell' | 'chime' | 'beep' | 'bounce' */
+  /** Selected interval tone: 'bell' | 'chime' | 'beep' | 'waves' */
   tone: IntervalTone;
   /** Interval in minutes (5 to 90 in 5-min increments) */
   intervalMinutes: number;

@@ -40,13 +40,9 @@ export function FrequencyPanel() {
 
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
   const beatFrequency = useAppStore((s) => s.beatFrequency);
-  const leftVolume = useAppStore((s) => s.leftVolume);
-  const rightVolume = useAppStore((s) => s.rightVolume);
 
   const setCarrierFrequency = useAppStore((s) => s.setCarrierFrequency);
   const setBeatFrequency = useAppStore((s) => s.setBeatFrequency);
-  const setLeftVolume = useAppStore((s) => s.setLeftVolume);
-  const setRightVolume = useAppStore((s) => s.setRightVolume);
 
   const currentBand = getBrainwaveBand(beatFrequency);
 
@@ -161,67 +157,6 @@ export function FrequencyPanel() {
                 ariaLabel="Carrier frequency in Hertz. Type exact value and press Enter."
               />
             </div>
-          </div>
-
-          {/* Left and Right Ear Volume Balance */}
-          <div className="ear-balance-row">
-            <div className="control-row ear-half">
-              <label htmlFor="vol-left">Left Ear</label>
-              <div className="slider-group">
-                <input
-                  id="vol-left"
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={leftVolume}
-                  onChange={(e) => setLeftVolume(Number(e.target.value))}
-                />
-                <CommitInput
-                  value={leftVolume}
-                  min={0}
-                  max={1}
-                  formatDisplay={(v) => `${Math.round(v * 100)}%`}
-                  parseInput={parsePercent}
-                  onCommit={(v) => setLeftVolume(v)}
-                  ariaLabel="Left ear volume percentage."
-                />
-              </div>
-            </div>
-
-            <div className="control-row ear-half">
-              <label htmlFor="vol-right">Right Ear</label>
-              <div className="slider-group">
-                <input
-                  id="vol-right"
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={rightVolume}
-                  onChange={(e) => setRightVolume(Number(e.target.value))}
-                />
-                <CommitInput
-                  value={rightVolume}
-                  min={0}
-                  max={1}
-                  formatDisplay={(v) => `${Math.round(v * 100)}%`}
-                  parseInput={parsePercent}
-                  onCommit={(v) => setRightVolume(v)}
-                  ariaLabel="Right ear volume percentage."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Frequency Readout */}
-          <div className="freq-readout" aria-live="polite">
-            <span className="ear-label">
-              Left: {(carrierFrequency - beatFrequency / 2).toFixed(1)} Hz
-            </span>
-            <span className="ear-label">
-              Right: {(carrierFrequency + beatFrequency / 2).toFixed(1)} Hz
-            </span>
           </div>
         </div>
       )}

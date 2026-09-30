@@ -5,10 +5,10 @@ import type { IntervalTone } from '../types/index.ts';
 import './IntervalPanel.css';
 
 const TONE_OPTIONS: { id: IntervalTone; label: string }[] = [
-  { id: 'bell',   label: 'Bell' },
-  { id: 'chime',  label: 'Chime' },
-  { id: 'beep',   label: 'Beep' },
-  { id: 'bounce', label: 'Bounce' },
+  { id: 'bell',  label: 'Bell' },
+  { id: 'chime', label: 'Chime' },
+  { id: 'beep',  label: 'Beep' },
+  { id: 'waves', label: 'Waves' },
 ];
 
 export function IntervalPanel() {
