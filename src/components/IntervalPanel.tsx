@@ -4,12 +4,11 @@ import { CommitInput } from './CommitInput.tsx';
 import type { IntervalTone } from '../types/index.ts';
 import './IntervalPanel.css';
 
-const PRESET_INTERVALS = [0, 5, 10, 15, 20, 30, 45, 60, 90];
-
-const TONE_OPTIONS: { id: IntervalTone; label: string; icon: string }[] = [
-  { id: 'bell',  label: 'Bell',  icon: '🔔' },
-  { id: 'chime', label: 'Chime', icon: '✨' },
-  { id: 'beep',  label: 'Beep',  icon: '📟' },
+const TONE_OPTIONS: { id: IntervalTone; label: string }[] = [
+  { id: 'bell',   label: 'Bell' },
+  { id: 'chime',  label: 'Chime' },
+  { id: 'beep',   label: 'Beep' },
+  { id: 'bounce', label: 'Bounce' },
 ];
 
 export function IntervalPanel() {
@@ -27,7 +26,6 @@ export function IntervalPanel() {
     if (str.toLowerCase().includes('off') || str.trim() === '0') return 0;
     const num = parseInt(str.replace(/[^0-9]/g, ''), 10);
     if (isNaN(num)) return null;
-    // Snap to nearest 5 minutes up to 90
     const clamped = Math.max(0, Math.min(90, num));
     return Math.round(clamped / 5) * 5;
   };
@@ -50,14 +48,26 @@ export function IntervalPanel() {
 
   return (
     <div className="interval-panel">
-      {/* Interval duration row (5 min increments up to 90 min) */}
+      {/* Sound selection dropdown (like Ambient Sound) */}
       <div className="control-row">
-        <div className="interval-header">
-          <label htmlFor="interval-slider">Interval Tone Timer</label>
-          <span className="interval-badge">
-            {intervalMinutes > 0 ? `Every ${intervalMinutes} min` : 'Disabled'}
-          </span>
-        </div>
+        <label htmlFor="interval-sound-select">Interval Sound</label>
+        <select
+          id="interval-sound-select"
+          className="interval-select"
+          value={intervalTone}
+          onChange={(e) => setIntervalTone(e.target.value as IntervalTone)}
+        >
+          {TONE_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Interval timer duration row (5 min increments up to 90 min) */}
+      <div className="control-row">
+        <label htmlFor="interval-slider">Interval Timer</label>
         <div className="slider-group">
           <input
             id="interval-slider"
@@ -79,43 +89,9 @@ export function IntervalPanel() {
             ariaLabel="Interval duration in minutes (5 to 90 min, 0 = Off). Type value and press Enter."
           />
         </div>
-
-        {/* Quick interval presets */}
-        <div className="interval-presets" role="group" aria-label="Interval presets">
-          {PRESET_INTERVALS.map((min) => (
-            <button
-              key={min}
-              type="button"
-              className={`preset-chip ${intervalMinutes === min ? 'active' : ''}`}
-              onClick={() => setIntervalMinutes(min)}
-            >
-              {min === 0 ? 'Off' : `${min}m`}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Tone Selection (Bell, Chime, Beep) */}
-      <div className="control-row">
-        <label>Interval Tone</label>
-        <div className="tone-selector" role="radiogroup" aria-label="Interval tone selection">
-          {TONE_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              role="radio"
-              aria-checked={intervalTone === opt.id}
-              className={`tone-btn ${intervalTone === opt.id ? 'active' : ''}`}
-              onClick={() => setIntervalTone(opt.id)}
-            >
-              <span className="tone-icon">{opt.icon}</span>
-              <span className="tone-label">{opt.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Interval Volume & Preview */}
+      {/* Interval Volume */}
       <div className="control-row">
         <label htmlFor="interval-volume">Interval Volume</label>
         <div className="slider-group">
@@ -135,7 +111,7 @@ export function IntervalPanel() {
             formatDisplay={(v) => `${Math.round(v * 100)}%`}
             parseInput={parsePercent}
             onCommit={(v) => setIntervalVolume(v)}
-            ariaLabel="Interval layer volume percentage. Type value and press Enter."
+            ariaLabel="Interval volume percentage. Type value and press Enter."
           />
         </div>
       </div>
@@ -146,13 +122,10 @@ export function IntervalPanel() {
           type="button"
           className={`interval-preview-btn ${isIntervalPreviewing ? 'active' : ''}`}
           onClick={handleTogglePreview}
-          title="Play 3 strikes with a 2-second pause, getting progressively louder"
+          title="Preview interval tone sequence"
         >
           {isIntervalPreviewing ? '⏹ Stop Preview' : '▶ Preview Interval (3x)'}
         </button>
-        <span className="interval-hint">
-          Repeats 3× with 2s pause, progressively louder
-        </span>
       </div>
     </div>
   );

@@ -40,7 +40,7 @@ export const PRESETS: PresetDefinition[] = [
     id: 'protocol-2',
     name: 'Protocol 2',
     tagline: 'Deep Rest & Brown Noise',
-    badge: 'Brown Noise • 3h • 90m Beep • MP3',
+    badge: 'Brown Noise • 3h • 90m Bounce • MP3',
     carrierFrequency: 150,
     beatFrequency: 4.0,
     masterVolume: 0.5,
@@ -48,8 +48,8 @@ export const PRESETS: PresetDefinition[] = [
     rightVolume: 0,
     timerDurationSeconds: 180 * 60, // 3 hours
     ambientLayers: [{ id: 'layer-1', soundId: 'brown-noise', volume: 0.6 }],
-    intervalTone: 'beep',
-    intervalMinutes: 90, // beep every 90 mins
+    intervalTone: 'bounce', // bounce is default for Protocol 2
+    intervalMinutes: 90, // each 90 mins
     intervalVolume: 0.5,
     exportFormat: 'mp3-192', // mp3 192 good
   },
