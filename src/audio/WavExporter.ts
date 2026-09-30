@@ -57,9 +57,9 @@ export class WavExporter {
     }
 
     if (bytes >= 1024 * 1024) {
-      return `~${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
-    return `~${Math.round(bytes / 1024)} KB`;
+    return `${Math.round(bytes / 1024)} KB`;
   }
 
   /**

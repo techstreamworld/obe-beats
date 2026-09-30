@@ -98,7 +98,7 @@ export function ExportButton() {
           onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
           disabled={isExporting}
         >
-          <option value="wav">WAV (Best) — {wavSize}</option>
+          <option value="wav">WAV 44.1 kHz, 16-bit (Best) — {wavSize}</option>
           <option value="mp3-320">MP3 320 kbps (High) — {mp3_320Size}</option>
           <option value="mp3-192">MP3 192 kbps (Good) — {mp3_192Size}</option>
         </select>

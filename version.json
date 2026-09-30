@@ -1,4 +1,4 @@
 {
-  "version": 77,
-  "lastUpdate": "Synthesized interval audio layer with Bell, Chime, Beep, 3-strike progressive volume, and customizable 5-90 min timer"
+  "version": 80,
+  "lastUpdate": "Display 44.1 kHz, 16-bit for WAV export and remove tilde signs from file size estimates"
 }
