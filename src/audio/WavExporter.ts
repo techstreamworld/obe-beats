@@ -12,6 +12,7 @@ export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
 
 export interface RenderOptions {
   binauralEnabled?: boolean;
+  binauralVolume?: number;
   carrierFrequency: number;
   beatFrequency: number;
   masterVolume: number;
@@ -128,7 +129,11 @@ export class WavExporter {
       rightOsc.connect(rightGain);
       rightGain.connect(merger, 0, 1);
 
-      merger.connect(masterGain);
+      const toneVol = options.binauralVolume ?? 0.5;
+      const toneGain = offlineCtx.createGain();
+      toneGain.gain.setValueAtTime(toneVol, 0);
+      merger.connect(toneGain);
+      toneGain.connect(masterGain);
 
       leftOsc.start(0);
       leftOsc.stop(duration);

@@ -1,3 +1,4 @@
+import { AudioEngine } from '../audio/AudioEngine.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './TransportBar.css';
 
@@ -9,6 +10,12 @@ export function TransportBar() {
   const resetAll = useAppStore((s) => s.resetAll);
 
   const isPlaying = playback === 'playing';
+
+  const handleReset = () => {
+    // Unconditionally and synchronously stop all live audio and reset internal state
+    AudioEngine.getInstance().resetDefaults();
+    resetAll();
+  };
 
   return (
     <div className="transport-bar" role="toolbar" aria-label="Audio playback controls">
@@ -54,7 +61,7 @@ export function TransportBar() {
       <button
         type="button"
         className="transport-btn btn-secondary btn-reset"
-        onClick={resetAll}
+        onClick={handleReset}
         aria-label="Reset all controls and settings to default"
         title="Reset all settings to default"
       >

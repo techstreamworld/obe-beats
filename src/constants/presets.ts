@@ -6,6 +6,7 @@ export interface PresetDefinition {
   tagline: string;
   badge: string;
   binauralEnabled: boolean;
+  binauralVolume: number;
   carrierFrequency: number;
   beatFrequency: number;
   masterVolume: number;
@@ -28,6 +29,7 @@ export const PRESETS: PresetDefinition[] = [
     tagline: 'Out of Body Experience',
     badge: '4.0 Hz Theta • 150 Hz • 90m',
     binauralEnabled: true,
+    binauralVolume: 0.5,
     carrierFrequency: 150,
     beatFrequency: 4.0,
     masterVolume: 0.5,
@@ -48,6 +50,7 @@ export const PRESETS: PresetDefinition[] = [
     tagline: 'Deep Rest & Brown Noise',
     badge: 'Brown Noise • 3h • 90m Bounce • MP3',
     binauralEnabled: false, // no binaural beat
+    binauralVolume: 0.5,
     carrierFrequency: 150,
     beatFrequency: 4.0,
     masterVolume: 0.5,
@@ -68,6 +71,7 @@ export const PRESETS: PresetDefinition[] = [
     tagline: 'Wake Back To Bed Lucid State',
     badge: '6.0 Hz Theta • 250 Hz • 30m',
     binauralEnabled: true,
+    binauralVolume: 0.5,
     carrierFrequency: 250,
     beatFrequency: 6.0,
     masterVolume: 0.5,
@@ -88,6 +92,7 @@ export const PRESETS: PresetDefinition[] = [
     tagline: 'Theta Relaxation & Rain',
     badge: '6.0 Hz Theta • 250 Hz • Rain • 30m',
     binauralEnabled: true,
+    binauralVolume: 0.5,
     carrierFrequency: 250,
     beatFrequency: 6.0,
     masterVolume: 0.5,

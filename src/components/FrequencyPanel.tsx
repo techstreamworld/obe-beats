@@ -35,6 +35,9 @@ export function FrequencyPanel() {
   const binauralEnabled = useAppStore((s) => s.binauralEnabled);
   const setBinauralEnabled = useAppStore((s) => s.setBinauralEnabled);
 
+  const binauralVolume = useAppStore((s) => s.binauralVolume);
+  const setBinauralVolume = useAppStore((s) => s.setBinauralVolume);
+
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
   const beatFrequency = useAppStore((s) => s.beatFrequency);
   const leftVolume = useAppStore((s) => s.leftVolume);
@@ -72,6 +75,31 @@ export function FrequencyPanel() {
       {/* Options revealed only when ticked */}
       {binauralEnabled && (
         <div className="binaural-options-container">
+          {/* Tone Volume (Default 50%) */}
+          <div className="control-row">
+            <label htmlFor="binaural-tone-vol">Tone Volume</label>
+            <div className="slider-group">
+              <input
+                id="binaural-tone-vol"
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={binauralVolume}
+                onChange={(e) => setBinauralVolume(Number(e.target.value))}
+              />
+              <CommitInput
+                value={binauralVolume}
+                min={0}
+                max={1}
+                formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                parseInput={parsePercent}
+                onCommit={(v) => setBinauralVolume(v)}
+                ariaLabel="Binaural tone volume percentage. Type value and press Enter."
+              />
+            </div>
+          </div>
+
           {/* Beat frequency */}
           <div className="control-row">
             <label htmlFor="beat-freq">Beat Frequency</label>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PRESETS } from '../constants/presets.ts';
+import { AudioEngine } from '../audio/AudioEngine.ts';
 import type {
   AmbientLayer,
   ExportFormat,
@@ -15,6 +16,7 @@ const DEFAULT_STATE = {
   playback: 'stopped' as PlaybackState,
   restartKey: 0,
   binauralEnabled: true,
+  binauralVolume: 0.5,
   carrierFrequency: 200,
   beatFrequency: 3,
   masterVolume: 0.5,
@@ -55,6 +57,8 @@ export interface AppState {
   // Binaural Beats & Frequencies
   binauralEnabled: boolean;
   setBinauralEnabled: (enabled: boolean) => void;
+  binauralVolume: number;
+  setBinauralVolume: (v: number) => void;
   carrierFrequency: number;
   beatFrequency: number;
   setCarrierFrequency: (hz: number) => void;
@@ -132,6 +136,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({
       activePresetId: preset.id,
       binauralEnabled: preset.binauralEnabled,
+      binauralVolume: preset.binauralVolume ?? 0.5,
       carrierFrequency: preset.carrierFrequency,
       beatFrequency: preset.beatFrequency,
       masterVolume: preset.masterVolume,
@@ -157,17 +162,36 @@ export const useAppStore = create<AppState>((set, get) => ({
   pause: () => set({ playback: 'paused' }),
   stop: () => set({ playback: 'stopped' }),
   restart: () => set((state) => ({ playback: 'playing', restartKey: state.restartKey + 1 })),
-  resetAll: () =>
+  resetAll: () => {
+    AudioEngine.getInstance().resetDefaults();
     set({
       ...DEFAULT_STATE,
+      playback: 'stopped',
       binauralEnabled: true,
+      binauralVolume: 0.5,
+      carrierFrequency: 200,
+      beatFrequency: 3,
+      masterVolume: 0.5,
+      leftVolume: 1,
+      rightVolume: 1,
+      timerDurationSeconds: 0,
+      timerState: { remainingSeconds: 0, isRunning: false },
       ambientEnabled: false,
       ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
+      intervalEnabled: false,
+      intervalTone: 'bell',
+      intervalMinutes: 15,
+      intervalVolume: 0.5,
+      isIntervalPreviewing: false,
+      exportFormat: 'wav',
+      exportStatus: 'idle',
       activePresetId: null,
-    }),
+    });
+  },
 
   // Binaural Beats & Frequencies
   setBinauralEnabled: (enabled) => set({ binauralEnabled: enabled, activePresetId: null }),
+  setBinauralVolume: (v) => set({ binauralVolume: v, activePresetId: null }),
   setCarrierFrequency: (hz) => set({ carrierFrequency: hz, activePresetId: null }),
   setBeatFrequency: (hz) => set({ beatFrequency: hz, activePresetId: null }),
 

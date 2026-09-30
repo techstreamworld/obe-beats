@@ -4,7 +4,7 @@
 //
 // Graph:
 //   L Oscillator → L Gain → Merger(0) ─┐
-//                                        ├→ (output)
+//                                        ├→ ToneGain → (output)
 //   R Oscillator → R Gain → Merger(1) ─┘
 
 export class BinauralNode {
@@ -14,14 +14,17 @@ export class BinauralNode {
   private leftGain: GainNode;
   private rightGain: GainNode;
   private merger: ChannelMergerNode;
+  private toneGain: GainNode;
 
   private carrierFreq: number;
   private beatFreq: number;
+  private toneVol: number;
 
-  constructor(ctx: AudioContext, carrier: number, beat: number) {
+  constructor(ctx: AudioContext, carrier: number, beat: number, toneVolume = 0.5) {
     this.ctx = ctx;
     this.carrierFreq = carrier;
     this.beatFreq = beat;
+    this.toneVol = toneVolume;
 
     // Persistent gain nodes (survive start/stop cycles)
     this.leftGain = ctx.createGain();
@@ -31,11 +34,16 @@ export class BinauralNode {
     this.merger = ctx.createChannelMerger(2);
     this.leftGain.connect(this.merger, 0, 0);
     this.rightGain.connect(this.merger, 0, 1);
+
+    // Binaural tone gain stage (default 50%)
+    this.toneGain = ctx.createGain();
+    this.toneGain.gain.setValueAtTime(toneVolume, ctx.currentTime);
+    this.merger.connect(this.toneGain);
   }
 
   /** The stereo output node — connect this to the next stage. */
-  get output(): ChannelMergerNode {
-    return this.merger;
+  get output(): GainNode {
+    return this.toneGain;
   }
 
   /** Create oscillators and start them. Idempotent. */
@@ -81,6 +89,11 @@ export class BinauralNode {
     this.applyFrequencies();
   }
 
+  setToneVolume(v: number): void {
+    this.toneVol = v;
+    this.toneGain.gain.setTargetAtTime(v, this.ctx.currentTime, 0.02);
+  }
+
   setLeftVolume(v: number): void {
     this.leftGain.gain.setTargetAtTime(v, this.ctx.currentTime, 0.02);
   }
@@ -90,6 +103,10 @@ export class BinauralNode {
   }
 
   // ── Computed frequencies ──
+
+  get toneVolume(): number {
+    return this.toneVol;
+  }
 
   get leftFrequency(): number {
     return this.carrierFreq - this.beatFreq / 2;
@@ -113,8 +130,13 @@ export class BinauralNode {
   /** Disconnect everything and release resources. */
   dispose(): void {
     this.stop();
-    this.leftGain.disconnect();
-    this.rightGain.disconnect();
-    this.merger.disconnect();
+    try {
+      this.leftGain.disconnect();
+      this.rightGain.disconnect();
+      this.merger.disconnect();
+      this.toneGain.disconnect();
+    } catch {
+      // ignore
+    }
   }
 }

@@ -26,6 +26,7 @@ export class AudioEngine {
   private _binauralEnabled = true;
   private carrierFreq = 200;
   private beatFreq = 3;
+  private toneVol = 0.5;
   private masterVol = 0.5;
   private leftVol = 1;
   private rightVol = 1;
@@ -106,7 +107,7 @@ export class AudioEngine {
       return;
     }
 
-    this.binauralNode = new BinauralNode(ctx, this.carrierFreq, this.beatFreq);
+    this.binauralNode = new BinauralNode(ctx, this.carrierFreq, this.beatFreq, this.toneVol);
     if (this._binauralEnabled) {
       this.binauralNode.setLeftVolume(this.leftVol);
       this.binauralNode.setRightVolume(this.rightVol);
@@ -137,14 +138,13 @@ export class AudioEngine {
     this._paused = true;
   }
 
-  /** Stop playback and tear down oscillators. */
+  /** Stop playback and tear down oscillators. Unconditional and safe. */
   stop(): void {
-    if (!this._playing && !this._paused) return;
-
     this.binauralNode?.dispose();
     this.binauralNode = null;
     this.ambientPlayer?.stop();
     this.intervalPlayer?.stop();
+    this.stopIntervalPreview();
     this._playing = false;
     this._paused = false;
 
@@ -152,10 +152,6 @@ export class AudioEngine {
     if (this.masterGain && this.ctx) {
       this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
       this.masterGain.gain.setValueAtTime(this.masterVol, this.ctx.currentTime);
-    }
-
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -206,6 +202,11 @@ export class AudioEngine {
   }
 
   // ── Volume setters ──
+
+  setBinauralVolume(v: number): void {
+    this.toneVol = v;
+    this.binauralNode?.setToneVolume(v);
+  }
 
   setMasterVolume(v: number): void {
     this.masterVol = v;
@@ -306,6 +307,25 @@ export class AudioEngine {
   fadeOut(seconds: number): void {
     if (this.masterGain && this.ctx) {
       FadeController.fadeOut(this.masterGain, this.ctx, seconds);
+    }
+  }
+
+  /** Reset all internal engine state to factory defaults and stop all playback. */
+  resetDefaults(): void {
+    this.stop();
+    this.carrierFreq = 200;
+    this.beatFreq = 3;
+    this.toneVol = 0.5;
+    this.masterVol = 0.5;
+    this.leftVol = 1.0;
+    this.rightVol = 1.0;
+    this._binauralEnabled = true;
+    this._ambientEnabled = false;
+    this._ambientLayers = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
+    this.intervalPlayer?.setConfig('bell', 0, 0.5);
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
     }
   }
 }

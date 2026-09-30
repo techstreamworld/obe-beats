@@ -1,4 +1,4 @@
 {
-  "version": 121,
-  "lastUpdate": "Sidebar vertical presets, merged master volume, ambient & binaural checkboxes"
+  "version": 138,
+  "lastUpdate": "Add binaural tone volume slider, fix reset live playback stop, add >60m WAV warning modal"
 }
