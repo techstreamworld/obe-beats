@@ -8,11 +8,13 @@ export function ExportButton() {
   const exportStatus = useAppStore((s) => s.exportStatus);
   const setExportStatus = useAppStore((s) => s.setExportStatus);
 
+  const binauralEnabled = useAppStore((s) => s.binauralEnabled);
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
   const beatFrequency = useAppStore((s) => s.beatFrequency);
   const masterVolume = useAppStore((s) => s.masterVolume);
   const leftVolume = useAppStore((s) => s.leftVolume);
   const rightVolume = useAppStore((s) => s.rightVolume);
+  const ambientEnabled = useAppStore((s) => s.ambientEnabled);
   const ambientLayers = useAppStore((s) => s.ambientLayers);
   const intervalEnabled = useAppStore((s) => s.intervalEnabled);
   const intervalTone = useAppStore((s) => s.intervalTone);
@@ -35,11 +37,13 @@ export function ExportButton() {
 
       const { blob, filename } = await WavExporter.exportAudio(
         {
+          binauralEnabled,
           carrierFrequency,
           beatFrequency,
           masterVolume,
           leftVolume,
           rightVolume,
+          ambientEnabled,
           ambientLayers,
           intervalTone,
           intervalMinutes: intervalEnabled ? intervalMinutes : 0,

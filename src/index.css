@@ -187,3 +187,63 @@ p {
   color: var(--text-h);
   white-space: nowrap;
 }
+
+/* ── Shared Panel Toggle Checkbox ── */
+.panel-toggle-row {
+  display: flex;
+  align-items: center;
+}
+
+.panel-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+}
+
+.panel-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: all 0.15s ease;
+  margin: 0;
+}
+
+.panel-checkbox:hover {
+  border-color: var(--accent);
+}
+
+.panel-checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.panel-checkbox:checked::before {
+  content: "";
+  width: 8px;
+  height: 4.5px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: rotate(-45deg) translate(0.5px, -0.5px);
+}
+
+.panel-checkbox:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.panel-checkbox-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-h);
+  letter-spacing: -0.2px;
+}

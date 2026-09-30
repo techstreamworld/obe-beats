@@ -1,4 +1,4 @@
 {
-  "version": 101,
-  "lastUpdate": "Add checkbox toggle to Interval Sound: unticked by default, reveals options when ticked"
+  "version": 121,
+  "lastUpdate": "Sidebar vertical presets, merged master volume, ambient & binaural checkboxes"
 }

@@ -23,11 +23,14 @@ export class AudioEngine {
   private masterGain: GainNode | null = null;
 
   // Stored params (applied to nodes when they exist)
+  private _binauralEnabled = true;
   private carrierFreq = 200;
   private beatFreq = 3;
   private masterVol = 0.5;
   private leftVol = 1;
   private rightVol = 1;
+
+  private _ambientEnabled = false;
   private _ambientLayers: AmbientLayer[] = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
 
   // Interval tone configuration
@@ -70,7 +73,9 @@ export class AudioEngine {
       this.masterGain.connect(this.ctx.destination);
 
       this.ambientPlayer = new AmbientPlayer(this.ctx, this.masterGain);
-      await this.ambientPlayer.syncLayers(this._ambientLayers);
+      if (this._ambientEnabled) {
+        await this.ambientPlayer.syncLayers(this._ambientLayers);
+      }
 
       this.intervalPlayer = new IntervalPlayer(this.ctx, this.masterGain);
       this.intervalPlayer.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume);
@@ -102,13 +107,18 @@ export class AudioEngine {
     }
 
     this.binauralNode = new BinauralNode(ctx, this.carrierFreq, this.beatFreq);
-    this.binauralNode.setLeftVolume(this.leftVol);
-    this.binauralNode.setRightVolume(this.rightVol);
+    if (this._binauralEnabled) {
+      this.binauralNode.setLeftVolume(this.leftVol);
+      this.binauralNode.setRightVolume(this.rightVol);
+    } else {
+      this.binauralNode.setLeftVolume(0);
+      this.binauralNode.setRightVolume(0);
+    }
     this.binauralNode.output.connect(this.masterGain!);
     this.binauralNode.start();
 
     // Start ambient & interval playback
-    if (this.ambientPlayer) {
+    if (this.ambientPlayer && this._ambientEnabled) {
       await this.ambientPlayer.play();
     }
     this.intervalPlayer?.play();
@@ -170,7 +180,20 @@ export class AudioEngine {
     AudioEngine.instance = null;
   }
 
-  // ── Frequency setters ──
+  // ── Binaural Enabled & Frequency setters ──
+
+  setBinauralEnabled(enabled: boolean): void {
+    this._binauralEnabled = enabled;
+    if (this.binauralNode) {
+      if (enabled) {
+        this.binauralNode.setLeftVolume(this.leftVol);
+        this.binauralNode.setRightVolume(this.rightVol);
+      } else {
+        this.binauralNode.setLeftVolume(0);
+        this.binauralNode.setRightVolume(0);
+      }
+    }
+  }
 
   setCarrierFrequency(hz: number): void {
     this.carrierFreq = hz;
@@ -193,20 +216,38 @@ export class AudioEngine {
 
   setLeftVolume(v: number): void {
     this.leftVol = v;
-    this.binauralNode?.setLeftVolume(v);
+    if (this._binauralEnabled) {
+      this.binauralNode?.setLeftVolume(v);
+    }
   }
 
   setRightVolume(v: number): void {
     this.rightVol = v;
-    this.binauralNode?.setRightVolume(v);
+    if (this._binauralEnabled) {
+      this.binauralNode?.setRightVolume(v);
+    }
   }
 
   // ── Ambient ──
 
+  async setAmbientEnabled(enabled: boolean): Promise<void> {
+    this._ambientEnabled = enabled;
+    if (this.ambientPlayer) {
+      if (enabled) {
+        await this.ambientPlayer.syncLayers(this._ambientLayers);
+        if (this._playing && !this._paused) {
+          await this.ambientPlayer.play();
+        }
+      } else {
+        this.ambientPlayer.stop();
+      }
+    }
+  }
+
   /** Set active ambient sound layers (multi-layer support). */
   async setAmbientLayers(layers: AmbientLayer[]): Promise<void> {
     this._ambientLayers = layers;
-    if (this.ambientPlayer) {
+    if (this.ambientPlayer && this._ambientEnabled) {
       await this.ambientPlayer.syncLayers(layers);
     }
   }

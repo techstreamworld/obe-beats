@@ -6,6 +6,23 @@
   gap: 10px;
 }
 
+.binaural-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.15s ease;
+}
+
+.ear-balance-row {
+  display: flex;
+  gap: 12px;
+}
+
+.ear-half {
+  flex: 1;
+  min-width: 0;
+}
+
 .wave-badge {
   display: inline-flex;
   align-items: center;
@@ -48,6 +65,13 @@
   color: var(--accent);
   font-family: var(--sans);
   font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .ear-balance-row {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 480px) {

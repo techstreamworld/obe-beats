@@ -8,11 +8,13 @@ import { useAppStore } from '../store/useAppStore.ts';
 
 export function useAudioEngine(): void {
   const playback = useAppStore((s) => s.playback);
+  const binauralEnabled = useAppStore((s) => s.binauralEnabled);
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
   const beatFrequency = useAppStore((s) => s.beatFrequency);
   const masterVolume = useAppStore((s) => s.masterVolume);
   const leftVolume = useAppStore((s) => s.leftVolume);
   const rightVolume = useAppStore((s) => s.rightVolume);
+  const ambientEnabled = useAppStore((s) => s.ambientEnabled);
   const ambientLayers = useAppStore((s) => s.ambientLayers);
 
   const intervalEnabled = useAppStore((s) => s.intervalEnabled);
@@ -33,7 +35,11 @@ export function useAudioEngine(): void {
     }
   }, [playback]);
 
-  // ── Sync frequencies ──
+  // ── Sync binaural beats enabled & frequencies ──
+  useEffect(() => {
+    AudioEngine.getInstance().setBinauralEnabled(binauralEnabled);
+  }, [binauralEnabled]);
+
   useEffect(() => {
     AudioEngine.getInstance().setCarrierFrequency(carrierFrequency);
   }, [carrierFrequency]);
@@ -55,7 +61,11 @@ export function useAudioEngine(): void {
     AudioEngine.getInstance().setRightVolume(rightVolume);
   }, [rightVolume]);
 
-  // ── Sync ambient layers ──
+  // ── Sync ambient sound ──
+  useEffect(() => {
+    AudioEngine.getInstance().setAmbientEnabled(ambientEnabled);
+  }, [ambientEnabled]);
+
   useEffect(() => {
     AudioEngine.getInstance().setAmbientLayers(ambientLayers);
   }, [ambientLayers]);

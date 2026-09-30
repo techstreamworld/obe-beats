@@ -10,10 +10,9 @@ export function PresetBar() {
     <section className="preset-bar" aria-label="Audio Presets">
       <div className="preset-bar-header">
         <span className="preset-bar-title">Presets</span>
-        <span className="preset-bar-caption">One-click scientifically-crafted configurations</span>
       </div>
 
-      <div className="preset-grid">
+      <div className="preset-vertical-list">
         {PRESETS.map((p) => {
           const isActive = activePresetId === p.id;
           return (

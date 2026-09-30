@@ -14,6 +14,7 @@ import type {
 const DEFAULT_STATE = {
   playback: 'stopped' as PlaybackState,
   restartKey: 0,
+  binauralEnabled: true,
   carrierFrequency: 200,
   beatFrequency: 3,
   masterVolume: 0.5,
@@ -23,6 +24,7 @@ const DEFAULT_STATE = {
   fadeInSeconds: 3,
   fadeOutSeconds: 3,
   timerState: { remainingSeconds: 0, isRunning: false },
+  ambientEnabled: false,
   ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }] as AmbientLayer[],
   intervalEnabled: false,
   intervalTone: 'bell' as IntervalTone,
@@ -50,7 +52,9 @@ export interface AppState {
   activePresetId: string | null;
   applyPreset: (presetId: string) => void;
 
-  // Frequencies
+  // Binaural Beats & Frequencies
+  binauralEnabled: boolean;
+  setBinauralEnabled: (enabled: boolean) => void;
   carrierFrequency: number;
   beatFrequency: number;
   setCarrierFrequency: (hz: number) => void;
@@ -75,6 +79,8 @@ export interface AppState {
   updateTimerState: (state: Partial<TimerState>) => void;
 
   // Ambient sound layers (multi-layer support)
+  ambientEnabled: boolean;
+  setAmbientEnabled: (enabled: boolean) => void;
   ambientLayers: AmbientLayer[];
   setAmbientLayerSound: (layerId: string, soundId: string | null) => void;
   setAmbientLayerVolume: (layerId: string, volume: number) => void;
@@ -125,6 +131,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!preset) return;
     set((state) => ({
       activePresetId: preset.id,
+      binauralEnabled: preset.binauralEnabled,
       carrierFrequency: preset.carrierFrequency,
       beatFrequency: preset.beatFrequency,
       masterVolume: preset.masterVolume,
@@ -135,6 +142,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         remainingSeconds: preset.timerDurationSeconds,
         isRunning: state.playback === 'playing',
       },
+      ambientEnabled: preset.ambientEnabled,
       ambientLayers: preset.ambientLayers,
       intervalEnabled: preset.intervalEnabled,
       intervalTone: preset.intervalTone,
@@ -152,11 +160,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   resetAll: () =>
     set({
       ...DEFAULT_STATE,
+      binauralEnabled: true,
+      ambientEnabled: false,
       ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
       activePresetId: null,
     }),
 
-  // Frequencies
+  // Binaural Beats & Frequencies
+  setBinauralEnabled: (enabled) => set({ binauralEnabled: enabled, activePresetId: null }),
   setCarrierFrequency: (hz) => set({ carrierFrequency: hz, activePresetId: null }),
   setBeatFrequency: (hz) => set({ beatFrequency: hz, activePresetId: null }),
 
@@ -173,6 +184,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({ timerState: { ...state.timerState, ...partial } })),
 
   // Ambient sound multi-layer actions
+  setAmbientEnabled: (enabled) => set({ ambientEnabled: enabled, activePresetId: null }),
   setAmbientLayerSound: (layerId: string, soundId: string | null) =>
     set((state) => ({
       activePresetId: null,

@@ -11,11 +11,13 @@ import type { AmbientLayer, IntervalTone } from '../types/index.ts';
 export type ExportFormat = 'wav' | 'mp3-320' | 'mp3-192';
 
 export interface RenderOptions {
+  binauralEnabled?: boolean;
   carrierFrequency: number;
   beatFrequency: number;
   masterVolume: number;
   leftVolume: number;
   rightVolume: number;
+  ambientEnabled?: boolean;
   ambientId?: string | null;
   ambientVolume?: number;
   ambientLayers?: AmbientLayer[];
@@ -103,58 +105,62 @@ export class WavExporter {
     }
 
     // ── Binaural Oscillators ──
-    const leftOsc = offlineCtx.createOscillator();
-    const rightOsc = offlineCtx.createOscillator();
-    leftOsc.type = 'sine';
-    rightOsc.type = 'sine';
+    if (options.binauralEnabled !== false) {
+      const leftOsc = offlineCtx.createOscillator();
+      const rightOsc = offlineCtx.createOscillator();
+      leftOsc.type = 'sine';
+      rightOsc.type = 'sine';
 
-    const leftFreq = Math.max(1, options.carrierFrequency - options.beatFrequency / 2);
-    const rightFreq = Math.max(1, options.carrierFrequency + options.beatFrequency / 2);
-    leftOsc.frequency.setValueAtTime(leftFreq, 0);
-    rightOsc.frequency.setValueAtTime(rightFreq, 0);
+      const leftFreq = Math.max(1, options.carrierFrequency - options.beatFrequency / 2);
+      const rightFreq = Math.max(1, options.carrierFrequency + options.beatFrequency / 2);
+      leftOsc.frequency.setValueAtTime(leftFreq, 0);
+      rightOsc.frequency.setValueAtTime(rightFreq, 0);
 
-    const leftGain = offlineCtx.createGain();
-    const rightGain = offlineCtx.createGain();
-    leftGain.gain.setValueAtTime(options.leftVolume, 0);
-    rightGain.gain.setValueAtTime(options.rightVolume, 0);
+      const leftGain = offlineCtx.createGain();
+      const rightGain = offlineCtx.createGain();
+      leftGain.gain.setValueAtTime(options.leftVolume, 0);
+      rightGain.gain.setValueAtTime(options.rightVolume, 0);
 
-    const merger = offlineCtx.createChannelMerger(2);
-    leftOsc.connect(leftGain);
-    leftGain.connect(merger, 0, 0);
+      const merger = offlineCtx.createChannelMerger(2);
+      leftOsc.connect(leftGain);
+      leftGain.connect(merger, 0, 0);
 
-    rightOsc.connect(rightGain);
-    rightGain.connect(merger, 0, 1);
+      rightOsc.connect(rightGain);
+      rightGain.connect(merger, 0, 1);
 
-    merger.connect(masterGain);
+      merger.connect(masterGain);
 
-    leftOsc.start(0);
-    leftOsc.stop(duration);
-    rightOsc.start(0);
-    rightOsc.stop(duration);
+      leftOsc.start(0);
+      leftOsc.stop(duration);
+      rightOsc.start(0);
+      rightOsc.stop(duration);
+    }
 
     // ── Ambient Sounds (multi-layer support) with default attenuation ──
-    const layersToRender: AmbientLayer[] =
-      options.ambientLayers && options.ambientLayers.length > 0
-        ? options.ambientLayers
-        : options.ambientId
-          ? [{ id: 'default', soundId: options.ambientId, volume: options.ambientVolume ?? 0.5 }]
-          : [];
+    if (options.ambientEnabled !== false) {
+      const layersToRender: AmbientLayer[] =
+        options.ambientLayers && options.ambientLayers.length > 0
+          ? options.ambientLayers
+          : options.ambientId
+            ? [{ id: 'default', soundId: options.ambientId, volume: options.ambientVolume ?? 0.5 }]
+            : [];
 
-    for (const layer of layersToRender) {
-      if (!layer.soundId) continue;
-      const boost = layer.soundId === 'black-noise' ? 1.6 : 1.0;
-      const ambientGain = offlineCtx.createGain();
-      ambientGain.gain.setValueAtTime(layer.volume * AMBIENT_GAIN_SCALE * boost, 0);
-      ambientGain.connect(masterGain);
+      for (const layer of layersToRender) {
+        if (!layer.soundId) continue;
+        const boost = layer.soundId === 'black-noise' ? 1.6 : 1.0;
+        const ambientGain = offlineCtx.createGain();
+        ambientGain.gain.setValueAtTime(layer.volume * AMBIENT_GAIN_SCALE * boost, 0);
+        ambientGain.connect(masterGain);
 
-      const ambientBuffer = await this.getAmbientBuffer(offlineCtx, layer.soundId);
-      if (ambientBuffer) {
-        const ambientSource = offlineCtx.createBufferSource();
-        ambientSource.buffer = ambientBuffer;
-        ambientSource.loop = true;
-        ambientSource.connect(ambientGain);
-        ambientSource.start(0);
-        ambientSource.stop(duration);
+        const ambientBuffer = await this.getAmbientBuffer(offlineCtx, layer.soundId);
+        if (ambientBuffer) {
+          const ambientSource = offlineCtx.createBufferSource();
+          ambientSource.buffer = ambientBuffer;
+          ambientSource.loop = true;
+          ambientSource.connect(ambientGain);
+          ambientSource.start(0);
+          ambientSource.stop(duration);
+        }
       }
     }
 

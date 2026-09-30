@@ -32,77 +32,171 @@ function getBrainwaveBand(hz: number): BrainwaveBand {
 }
 
 export function FrequencyPanel() {
+  const binauralEnabled = useAppStore((s) => s.binauralEnabled);
+  const setBinauralEnabled = useAppStore((s) => s.setBinauralEnabled);
+
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
   const beatFrequency = useAppStore((s) => s.beatFrequency);
+  const leftVolume = useAppStore((s) => s.leftVolume);
+  const rightVolume = useAppStore((s) => s.rightVolume);
+
   const setCarrierFrequency = useAppStore((s) => s.setCarrierFrequency);
   const setBeatFrequency = useAppStore((s) => s.setBeatFrequency);
+  const setLeftVolume = useAppStore((s) => s.setLeftVolume);
+  const setRightVolume = useAppStore((s) => s.setRightVolume);
 
   const currentBand = getBrainwaveBand(beatFrequency);
 
+  const parsePercent = (str: string) => {
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(num)) return null;
+    return Math.min(1, Math.max(0, Math.round(num) / 100));
+  };
+
   return (
     <div className="frequency-panel">
-      {/* Beat frequency */}
-      <div className="control-row">
-        <label htmlFor="beat-freq">Beat Frequency</label>
-        <div className="slider-group">
+      {/* Checkbox toggle header */}
+      <div className="panel-toggle-row binaural-toggle-row">
+        <label className="panel-checkbox-label binaural-checkbox-label" htmlFor="binaural-enabled-checkbox">
           <input
-            id="beat-freq"
-            type="range"
-            min={0.5}
-            max={40}
-            step={0.1}
-            value={beatFrequency}
-            onChange={(e) => setBeatFrequency(Number(e.target.value))}
+            id="binaural-enabled-checkbox"
+            type="checkbox"
+            className="panel-checkbox binaural-checkbox"
+            checked={binauralEnabled}
+            onChange={(e) => setBinauralEnabled(e.target.checked)}
           />
-          <CommitInput
-            value={beatFrequency}
-            min={0.5}
-            max={40.0}
-            formatDisplay={(v) => `${Number.isInteger(v * 10) ? v.toFixed(1) : v.toFixed(2)} Hz`}
-            parseInput={(str) => {
-              const num = parseFloat(str.replace(/[^0-9.]/g, ''));
-              return isNaN(num) ? null : Math.round(num * 100) / 100;
-            }}
-            onCommit={(v) => setBeatFrequency(v)}
-            ariaLabel="Beat frequency in Hertz. Type exact value and press Enter."
-          />
-          <span
-            className="wave-badge"
-            title={`${currentBand.name} waves (${currentBand.range})`}
-            aria-label={`Current brainwave band: ${currentBand.name} waves, range ${currentBand.range}`}
-          >
-            {currentBand.name} Waves
-          </span>
-        </div>
+          <span className="panel-checkbox-title binaural-checkbox-title">Binaural Beats</span>
+        </label>
       </div>
 
-      {/* Carrier frequency */}
-      <div className="control-row">
-        <label htmlFor="carrier-freq">Carrier Frequency</label>
-        <div className="slider-group">
-          <input
-            id="carrier-freq"
-            type="range"
-            min={20}
-            max={1500}
-            step={1}
-            value={carrierFrequency}
-            onChange={(e) => setCarrierFrequency(Number(e.target.value))}
-          />
-          <CommitInput
-            value={carrierFrequency}
-            min={20}
-            max={1500}
-            formatDisplay={(v) => `${Math.round(v)} Hz`}
-            parseInput={(str) => {
-              const num = parseFloat(str.replace(/[^0-9.]/g, ''));
-              return isNaN(num) ? null : Math.round(num);
-            }}
-            onCommit={(v) => setCarrierFrequency(v)}
-            ariaLabel="Carrier frequency in Hertz. Type exact value and press Enter."
-          />
+      {/* Options revealed only when ticked */}
+      {binauralEnabled && (
+        <div className="binaural-options-container">
+          {/* Beat frequency */}
+          <div className="control-row">
+            <label htmlFor="beat-freq">Beat Frequency</label>
+            <div className="slider-group">
+              <input
+                id="beat-freq"
+                type="range"
+                min={0.5}
+                max={40}
+                step={0.1}
+                value={beatFrequency}
+                onChange={(e) => setBeatFrequency(Number(e.target.value))}
+              />
+              <CommitInput
+                value={beatFrequency}
+                min={0.5}
+                max={40.0}
+                formatDisplay={(v) => `${Number.isInteger(v * 10) ? v.toFixed(1) : v.toFixed(2)} Hz`}
+                parseInput={(str) => {
+                  const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+                  return isNaN(num) ? null : Math.round(num * 100) / 100;
+                }}
+                onCommit={(v) => setBeatFrequency(v)}
+                ariaLabel="Beat frequency in Hertz. Type exact value and press Enter."
+              />
+              <span
+                className="wave-badge"
+                title={`${currentBand.name} waves (${currentBand.range})`}
+                aria-label={`Current brainwave band: ${currentBand.name} waves, range ${currentBand.range}`}
+              >
+                {currentBand.name} Waves
+              </span>
+            </div>
+          </div>
+
+          {/* Carrier frequency */}
+          <div className="control-row">
+            <label htmlFor="carrier-freq">Carrier Frequency</label>
+            <div className="slider-group">
+              <input
+                id="carrier-freq"
+                type="range"
+                min={20}
+                max={1500}
+                step={1}
+                value={carrierFrequency}
+                onChange={(e) => setCarrierFrequency(Number(e.target.value))}
+              />
+              <CommitInput
+                value={carrierFrequency}
+                min={20}
+                max={1500}
+                formatDisplay={(v) => `${Math.round(v)} Hz`}
+                parseInput={(str) => {
+                  const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+                  return isNaN(num) ? null : Math.round(num);
+                }}
+                onCommit={(v) => setCarrierFrequency(v)}
+                ariaLabel="Carrier frequency in Hertz. Type exact value and press Enter."
+              />
+            </div>
+          </div>
+
+          {/* Left and Right Ear Volume Balance */}
+          <div className="ear-balance-row">
+            <div className="control-row ear-half">
+              <label htmlFor="vol-left">Left Ear</label>
+              <div className="slider-group">
+                <input
+                  id="vol-left"
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={leftVolume}
+                  onChange={(e) => setLeftVolume(Number(e.target.value))}
+                />
+                <CommitInput
+                  value={leftVolume}
+                  min={0}
+                  max={1}
+                  formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                  parseInput={parsePercent}
+                  onCommit={(v) => setLeftVolume(v)}
+                  ariaLabel="Left ear volume percentage."
+                />
+              </div>
+            </div>
+
+            <div className="control-row ear-half">
+              <label htmlFor="vol-right">Right Ear</label>
+              <div className="slider-group">
+                <input
+                  id="vol-right"
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={rightVolume}
+                  onChange={(e) => setRightVolume(Number(e.target.value))}
+                />
+                <CommitInput
+                  value={rightVolume}
+                  min={0}
+                  max={1}
+                  formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                  parseInput={parsePercent}
+                  onCommit={(v) => setRightVolume(v)}
+                  ariaLabel="Right ear volume percentage."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Frequency Readout */}
+          <div className="freq-readout" aria-live="polite">
+            <span className="ear-label">
+              Left: {(carrierFrequency - beatFrequency / 2).toFixed(1)} Hz
+            </span>
+            <span className="ear-label">
+              Right: {(carrierFrequency + beatFrequency / 2).toFixed(1)} Hz
+            </span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

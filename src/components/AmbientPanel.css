@@ -6,6 +6,13 @@
   gap: 12px;
 }
 
+.ambient-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.15s ease;
+}
+
 .ambient-layer-row {
   display: flex;
   flex-direction: column;

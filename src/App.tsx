@@ -1,16 +1,15 @@
-import { useAudioEngine } from './hooks/useAudioEngine.ts'
-import { useTimer } from './hooks/useTimer.ts'
-import { TransportBar } from './components/TransportBar.tsx'
-import { PresetBar } from './components/PresetBar.tsx'
-import { FrequencyPanel } from './components/FrequencyPanel.tsx'
-import { VolumePanel } from './components/VolumePanel.tsx'
-import { TimerPanel } from './components/TimerPanel.tsx'
-import { IntervalPanel } from './components/IntervalPanel.tsx'
-import { AmbientPanel } from './components/AmbientPanel.tsx'
-import { ExportButton } from './components/ExportButton.tsx'
-import { VersionBar } from './components/VersionBar.tsx'
-import { BlackScreen } from './components/BlackScreen.tsx'
-import './App.css'
+import { useAudioEngine } from './hooks/useAudioEngine.ts';
+import { useTimer } from './hooks/useTimer.ts';
+import { TransportBar } from './components/TransportBar.tsx';
+import { PresetBar } from './components/PresetBar.tsx';
+import { FrequencyPanel } from './components/FrequencyPanel.tsx';
+import { TimerPanel } from './components/TimerPanel.tsx';
+import { IntervalPanel } from './components/IntervalPanel.tsx';
+import { AmbientPanel } from './components/AmbientPanel.tsx';
+import { ExportButton } from './components/ExportButton.tsx';
+import { VersionBar } from './components/VersionBar.tsx';
+import { BlackScreen } from './components/BlackScreen.tsx';
+import './App.css';
 
 function App() {
   // Bridge Zustand store → AudioEngine singleton
@@ -35,46 +34,46 @@ function App() {
         </div>
       </header>
 
-      {/* Quick Visual Presets Bar */}
-      <PresetBar />
+      {/* Main Layout: Presets Sidebar on Left + Controls Dashboard */}
+      <div className="app-content">
+        <aside className="app-sidebar" aria-label="Presets Sidebar">
+          <PresetBar />
+        </aside>
 
-      <main className="app-main">
-        {/* Left Column: Sound Generation & Levels */}
-        <div className="app-column">
-          <section className="panel" aria-label="Binaural Frequencies">
-            <FrequencyPanel />
-          </section>
+        <main className="app-main">
+          {/* Left Controls Column: Binaural Beats & Ambient Sound */}
+          <div className="app-column">
+            <section className="panel" aria-label="Binaural Beats">
+              <FrequencyPanel />
+            </section>
 
-          <section className="panel" aria-label="Volume & Balance">
-            <VolumePanel />
-          </section>
+            <section className="panel" aria-label="Ambient Sound">
+              <AmbientPanel />
+            </section>
+          </div>
 
-          <section className="panel" aria-label="Ambient Sound">
-            <AmbientPanel />
-          </section>
-        </div>
+          {/* Right Controls Column: Session Runtime, Master Volume, Interval Sound & Audio Export */}
+          <div className="app-column">
+            <section className="panel" aria-label="Session Duration & Master Volume">
+              <TimerPanel />
+            </section>
 
-        {/* Right Column: Session Runtime, Interval & Audio Export */}
-        <div className="app-column">
-          <section className="panel" aria-label="Session Timer">
-            <TimerPanel />
-          </section>
+            <section className="panel" aria-label="Interval Sound">
+              <IntervalPanel />
+            </section>
 
-          <section className="panel" aria-label="Interval Sound">
-            <IntervalPanel />
-          </section>
-
-          <section className="panel" aria-label="Audio Export (WAV / MP3)">
-            <ExportButton />
-          </section>
-        </div>
-      </main>
+            <section className="panel" aria-label="Audio Export (WAV / MP3)">
+              <ExportButton />
+            </section>
+          </div>
+        </main>
+      </div>
 
       <footer className="app-footer">
         <small>OBE Beats — use headphones for binaural brainwave entrainment</small>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
