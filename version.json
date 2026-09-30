@@ -1,4 +1,4 @@
 {
-  "version": 147,
-  "lastUpdate": "Add ocean waves interval sound, double beep, lower interval volume, move ear balance to timer panel, remove binaural readout"
+  "version": 152,
+  "lastUpdate": "Fix restart live playback race on reset, stack interval sound under ambient sound"
 }

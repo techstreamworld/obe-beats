@@ -41,7 +41,7 @@ function App() {
         </aside>
 
         <main className="app-main">
-          {/* Left Controls Column: Binaural Beats & Ambient Sound */}
+          {/* Left Controls Column: Sound Generators (Binaural Beats, Ambient Sound, Interval Sound) */}
           <div className="app-column">
             <section className="panel" aria-label="Binaural Beats">
               <FrequencyPanel />
@@ -50,16 +50,16 @@ function App() {
             <section className="panel" aria-label="Ambient Sound">
               <AmbientPanel />
             </section>
-          </div>
-
-          {/* Right Controls Column: Session Runtime, Master Volume, Interval Sound & Audio Export */}
-          <div className="app-column">
-            <section className="panel" aria-label="Session Duration & Master Volume">
-              <TimerPanel />
-            </section>
 
             <section className="panel" aria-label="Interval Sound">
               <IntervalPanel />
+            </section>
+          </div>
+
+          {/* Right Controls Column: Session Runtime, Master Volume & Audio Export */}
+          <div className="app-column">
+            <section className="panel" aria-label="Session Duration & Master Volume">
+              <TimerPanel />
             </section>
 
             <section className="panel" aria-label="Audio Export (WAV / MP3)">

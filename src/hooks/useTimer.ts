@@ -73,7 +73,7 @@ export function useTimer(): void {
       if (isRestart) {
         // Restart requested: re-trigger engine restart & fade-in
         engine.restart().then(() => {
-          if (fadeInSeconds > 0) {
+          if (useAppStore.getState().playback === 'playing' && fadeInSeconds > 0) {
             engine.fadeIn(fadeInSeconds);
           }
         });

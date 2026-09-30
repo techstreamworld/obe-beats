@@ -42,6 +42,7 @@ export class AudioEngine {
 
   private _playing = false;
   private _paused = false;
+  private playSessionId = 0;
 
   private constructor() {}
 
@@ -96,12 +97,15 @@ export class AudioEngine {
   async play(): Promise<void> {
     if (this._playing && !this._paused) return;
 
+    const currentSession = ++this.playSessionId;
     const ctx = await this.ensureContext();
+    if (currentSession !== this.playSessionId) return;
 
     if (this._paused) {
       if (ctx.state === 'suspended') {
         await ctx.resume();
       }
+      if (currentSession !== this.playSessionId) return;
       this.intervalPlayer?.play();
       this._paused = false;
       return;
@@ -121,6 +125,12 @@ export class AudioEngine {
     // Start ambient & interval playback
     if (this.ambientPlayer && this._ambientEnabled) {
       await this.ambientPlayer.play();
+      if (currentSession !== this.playSessionId) {
+        this.binauralNode?.dispose();
+        this.binauralNode = null;
+        this.ambientPlayer?.stop();
+        return;
+      }
     }
     this.intervalPlayer?.play();
 
@@ -140,6 +150,7 @@ export class AudioEngine {
 
   /** Stop playback and tear down oscillators. Unconditional and safe. */
   stop(): void {
+    this.playSessionId++; // Invalidate any in-flight play or restart operations immediately
     this.binauralNode?.dispose();
     this.binauralNode = null;
     this.ambientPlayer?.stop();
