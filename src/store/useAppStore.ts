@@ -24,8 +24,9 @@ const DEFAULT_STATE = {
   fadeOutSeconds: 3,
   timerState: { remainingSeconds: 0, isRunning: false },
   ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }] as AmbientLayer[],
+  intervalEnabled: false,
   intervalTone: 'bell' as IntervalTone,
-  intervalMinutes: 0,
+  intervalMinutes: 15,
   intervalVolume: 0.5,
   isIntervalPreviewing: false,
   exportFormat: 'wav' as ExportFormat,
@@ -81,10 +82,12 @@ export interface AppState {
   removeAmbientLayer: (layerId: string) => void;
 
   // Interval Audio Layer
+  intervalEnabled: boolean;
   intervalTone: IntervalTone;
   intervalMinutes: number;
   intervalVolume: number;
   isIntervalPreviewing: boolean;
+  setIntervalEnabled: (enabled: boolean) => void;
   setIntervalTone: (tone: IntervalTone) => void;
   setIntervalMinutes: (minutes: number) => void;
   setIntervalVolume: (v: number) => void;
@@ -133,6 +136,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         isRunning: state.playback === 'playing',
       },
       ambientLayers: preset.ambientLayers,
+      intervalEnabled: preset.intervalEnabled,
       intervalTone: preset.intervalTone,
       intervalMinutes: preset.intervalMinutes,
       intervalVolume: preset.intervalVolume,
@@ -204,6 +208,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   // Interval Audio Layer actions
+  setIntervalEnabled: (enabled) => set({ intervalEnabled: enabled, activePresetId: null }),
   setIntervalTone: (tone) => set({ intervalTone: tone, activePresetId: null }),
   setIntervalMinutes: (min) => set({ intervalMinutes: min, activePresetId: null }),
   setIntervalVolume: (v) => set({ intervalVolume: v }),

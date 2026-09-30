@@ -15,6 +15,7 @@ export function useAudioEngine(): void {
   const rightVolume = useAppStore((s) => s.rightVolume);
   const ambientLayers = useAppStore((s) => s.ambientLayers);
 
+  const intervalEnabled = useAppStore((s) => s.intervalEnabled);
   const intervalTone = useAppStore((s) => s.intervalTone);
   const intervalMinutes = useAppStore((s) => s.intervalMinutes);
   const intervalVolume = useAppStore((s) => s.intervalVolume);
@@ -61,8 +62,9 @@ export function useAudioEngine(): void {
 
   // ── Sync interval layer ──
   useEffect(() => {
-    AudioEngine.getInstance().setIntervalConfig(intervalTone, intervalMinutes, intervalVolume);
-  }, [intervalTone, intervalMinutes, intervalVolume]);
+    const effectiveMinutes = intervalEnabled ? intervalMinutes : 0;
+    AudioEngine.getInstance().setIntervalConfig(intervalTone, effectiveMinutes, intervalVolume);
+  }, [intervalEnabled, intervalTone, intervalMinutes, intervalVolume]);
 
   useEffect(() => {
     AudioEngine.getInstance().onIntervalPreviewChange((previewing) => {

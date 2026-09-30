@@ -6,6 +6,84 @@
   gap: 10px;
 }
 
+.interval-toggle-row {
+  display: flex;
+  align-items: center;
+}
+
+.interval-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+}
+
+.interval-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: all 0.15s ease;
+  margin: 0;
+}
+
+.interval-checkbox:hover {
+  border-color: var(--accent);
+}
+
+.interval-checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.interval-checkbox:checked::before {
+  content: "";
+  width: 8px;
+  height: 4.5px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: rotate(-45deg) translate(0.5px, -0.5px);
+}
+
+.interval-checkbox:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.interval-checkbox-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.2px;
+}
+
+.interval-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+  animation: intervalFadeIn 0.18s ease-out;
+}
+
+@keyframes intervalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .interval-select {
   width: 100%;
   min-height: 38px;

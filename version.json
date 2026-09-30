@@ -1,4 +1,4 @@
 {
-  "version": 92,
-  "lastUpdate": "Add 5-second Bounce interval sound, quick fade-outs for Bell and Chime, lowered default volume, and simplified Interval panel"
+  "version": 101,
+  "lastUpdate": "Add checkbox toggle to Interval Sound: unticked by default, reveals options when ticked"
 }

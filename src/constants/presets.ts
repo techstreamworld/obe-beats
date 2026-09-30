@@ -12,6 +12,7 @@ export interface PresetDefinition {
   rightVolume: number;
   timerDurationSeconds: number;
   ambientLayers: AmbientLayer[];
+  intervalEnabled: boolean;
   intervalTone: IntervalTone;
   intervalMinutes: number;
   intervalVolume: number;
@@ -31,8 +32,9 @@ export const PRESETS: PresetDefinition[] = [
     rightVolume: 1.0,
     timerDurationSeconds: 90 * 60,
     ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
+    intervalEnabled: false,
     intervalTone: 'bell',
-    intervalMinutes: 0,
+    intervalMinutes: 15,
     intervalVolume: 0.5,
     exportFormat: 'wav',
   },
@@ -48,6 +50,7 @@ export const PRESETS: PresetDefinition[] = [
     rightVolume: 0,
     timerDurationSeconds: 180 * 60, // 3 hours
     ambientLayers: [{ id: 'layer-1', soundId: 'brown-noise', volume: 0.6 }],
+    intervalEnabled: true,
     intervalTone: 'bounce', // bounce is default for Protocol 2
     intervalMinutes: 90, // each 90 mins
     intervalVolume: 0.5,
@@ -65,8 +68,9 @@ export const PRESETS: PresetDefinition[] = [
     rightVolume: 1.0,
     timerDurationSeconds: 30 * 60,
     ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
+    intervalEnabled: false,
     intervalTone: 'bell',
-    intervalMinutes: 0,
+    intervalMinutes: 15,
     intervalVolume: 0.5,
     exportFormat: 'wav',
   },
@@ -82,8 +86,9 @@ export const PRESETS: PresetDefinition[] = [
     rightVolume: 1.0,
     timerDurationSeconds: 30 * 60,
     ambientLayers: [{ id: 'layer-1', soundId: 'rain', volume: 0.5 }],
+    intervalEnabled: false,
     intervalTone: 'bell',
-    intervalMinutes: 0,
+    intervalMinutes: 15,
     intervalVolume: 0.5,
     exportFormat: 'wav',
   },

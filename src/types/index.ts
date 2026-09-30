@@ -74,9 +74,11 @@ export type PlaybackState = 'stopped' | 'playing' | 'paused';
 export type IntervalTone = 'bell' | 'chime' | 'beep' | 'bounce';
 
 export interface IntervalConfig {
-  /** Selected interval tone: 'bell' | 'chime' | 'beep' */
+  /** Whether the interval tone layer is enabled */
+  enabled: boolean;
+  /** Selected interval tone: 'bell' | 'chime' | 'beep' | 'bounce' */
   tone: IntervalTone;
-  /** Interval in minutes (5 to 90 in 5-min increments, 0 = Off) */
+  /** Interval in minutes (5 to 90 in 5-min increments) */
   intervalMinutes: number;
   /** Volume of the interval tone layer (0 to 1) */
   volume: number;
