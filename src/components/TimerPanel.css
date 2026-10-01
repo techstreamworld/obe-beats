@@ -30,14 +30,8 @@
   flex: 1;
 }
 
-.ear-balance-row {
-  display: flex;
-  gap: 12px;
-}
-
-.ear-half {
-  flex: 1;
-  min-width: 0;
+.ear-volume-row {
+  width: 100%;
 }
 
 @media (max-width: 600px) {
@@ -49,10 +43,5 @@
 
   .countdown {
     font-size: 28px;
-  }
-
-  .ear-balance-row {
-    flex-direction: column;
-    gap: 10px;
   }
 }

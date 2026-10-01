@@ -19,8 +19,6 @@ function App() {
 
   return (
     <div className="app-shell">
-      <VersionBar />
-
       <header className="app-header">
         <div className="header-brand">
           <h1>
@@ -76,6 +74,9 @@ function App() {
       <footer className="app-footer">
         <small>Free, private, and ad-free. OBE Beats — use headphones for binaural brainwave entrainment.</small>
       </footer>
+
+      {/* Floating version badge at the bottom-right corner of screen */}
+      <VersionBar />
     </div>
   );
 }

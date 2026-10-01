@@ -8,13 +8,15 @@
 
 /* ── Header Toolbar ── */
 .app-header {
-  padding: 12px 22px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header-brand {
@@ -65,20 +67,20 @@
 .app-content {
   flex: 1;
   display: flex;
-  gap: 16px;
-  padding: 16px 22px;
+  gap: 18px;
+  padding: 18px 24px;
   align-items: flex-start;
   box-sizing: border-box;
-  max-width: 1440px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* ── Left Sidebar: Stacked Presets ── */
 .app-sidebar {
-  width: 255px;
+  width: 260px;
   min-width: 245px;
-  max-width: 275px;
+  max-width: 280px;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -88,14 +90,14 @@
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 18px;
   min-width: 0;
 }
 
 .app-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   min-width: 0;
 }
 
@@ -120,12 +122,14 @@
 
 /* ── Footer ── */
 .app-footer {
-  padding: 12px 18px;
+  padding: 12px 24px;
   text-align: center;
   border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 11.5px;
   background: var(--bg-surface);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Responsive Tablet & Mobile ── */
