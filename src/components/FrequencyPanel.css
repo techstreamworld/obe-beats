@@ -21,9 +21,9 @@
   font-family: var(--sans);
   font-size: 12px;
   font-weight: 600;
-  color: #93c5fd;
-  background: rgba(37, 99, 235, 0.12);
-  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: var(--outline-accent);
+  background: rgba(141, 143, 248, 0.1);
+  border: 1px solid var(--accent-border);
   padding: 4px 12px;
   border-radius: 9999px;
   white-space: nowrap;

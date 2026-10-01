@@ -29,57 +29,58 @@
 }
 
 .transport-btn:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--outline-accent);
   outline-offset: 2px;
 }
 
-/* Play / Pause button — solid royal blue pill */
+/* Play / Pause button — primary button blue pill */
 .btn-play-pause {
-  min-width: 100px;
+  min-width: 102px;
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #ffffff;
+  color: var(--text-h);
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .btn-play-pause:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 6px 18px rgba(52, 116, 240, 0.45);
 }
 
 .btn-play-pause.is-playing {
   background: #1e40af;
-  border-color: var(--accent-light);
-  color: #ffffff;
+  border-color: var(--outline-accent);
+  color: var(--text-h);
 }
 
 .btn-play-pause.is-playing:hover {
   background: #1d4ed8;
+  border-color: var(--outline-accent);
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
 }
 
-/* Secondary Action Buttons (Restart & Reset) — dark navy pill */
+/* Secondary Action Buttons (Restart & Reset) — dark meditation pill */
 .btn-secondary {
   border: 1px solid var(--border-light);
   background: var(--bg-input);
-  color: var(--text-h);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
   background: var(--bg-elevated);
-  border-color: var(--accent-light);
-  color: #ffffff;
+  border-color: var(--outline-accent);
+  color: var(--text-h);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn-restart:hover {
-  border-color: var(--accent-light);
-  color: #ffffff;
+  border-color: var(--outline-accent);
+  color: var(--text-h);
 }
 
 .btn-reset:hover {
-  border-color: rgba(239, 68, 68, 0.6);
+  border-color: rgba(239, 68, 68, 0.55);
   color: #fca5a5;
   background: rgba(239, 68, 68, 0.1);
 }
