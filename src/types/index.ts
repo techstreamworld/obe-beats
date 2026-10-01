@@ -82,4 +82,6 @@ export interface IntervalConfig {
   intervalMinutes: number;
   /** Volume of the interval tone layer (0 to 1) */
   volume: number;
+  /** Number of times the interval tone plays (1 to 5, default 3) */
+  repeatCount: number;
 }

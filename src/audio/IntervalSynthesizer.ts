@@ -108,8 +108,8 @@ export class IntervalSynthesizer {
       data[i] = (filterState * 0.9 + rumble) * swell;
     }
 
-    // Normalized gentle low volume (0.25)
-    this.normalize(data, 0.25);
+    // Normalized gentle low volume (0.16)
+    this.normalize(data, 0.16);
     return buffer;
   }
 
@@ -117,7 +117,7 @@ export class IntervalSynthesizer {
    * Double Beep Notification:
    * Two short gentle tones with a short gap in between.
    * Beep 1: 0.00s–0.11s, Pause: 0.11s–0.18s, Beep 2: 0.18s–0.29s.
-   * Lowered default volume (0.20).
+   * Lowered default volume (0.13).
    */
   static createDoubleBeepBuffer(ctx: BaseAudioContext): AudioBuffer {
     const duration = 0.38; // 380ms total
@@ -167,13 +167,13 @@ export class IntervalSynthesizer {
       }
     }
 
-    // Lowered default volume (0.20)
-    this.normalize(data, 0.20);
+    // Lowered default volume (0.13)
+    this.normalize(data, 0.13);
     return buffer;
   }
 
   /**
-   * Meditative Bell with quick fade out (~1.4s duration) and reduced internal volume (0.22).
+   * Meditative Bell with quick fade out (~1.4s duration) and reduced internal volume (0.14).
    */
   static createBellBuffer(ctx: BaseAudioContext): AudioBuffer {
     const duration = 1.4; // Quick fade out
@@ -208,13 +208,13 @@ export class IntervalSynthesizer {
       data[i] = (sample + mallet) * attack * fadeOut;
     }
 
-    // Lowered default volume (0.22)
-    this.normalize(data, 0.22);
+    // Lowered default volume (0.14)
+    this.normalize(data, 0.14);
     return buffer;
   }
 
   /**
-   * Crystalline Chime with quick fade out (~1.1s duration) and reduced internal volume (0.18).
+   * Crystalline Chime with quick fade out (~1.1s duration) and reduced internal volume (0.12).
    */
   static createChimeBuffer(ctx: BaseAudioContext): AudioBuffer {
     const duration = 1.1; // Quick fade out
@@ -247,8 +247,8 @@ export class IntervalSynthesizer {
       data[i] = sample * tremolo * attack * fadeOut;
     }
 
-    // Lowered default volume (0.18)
-    this.normalize(data, 0.18);
+    // Lowered default volume (0.12)
+    this.normalize(data, 0.12);
     return buffer;
   }
 

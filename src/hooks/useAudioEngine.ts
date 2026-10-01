@@ -22,6 +22,7 @@ export function useAudioEngine(): void {
   const intervalTone = useAppStore((s) => s.intervalTone);
   const intervalMinutes = useAppStore((s) => s.intervalMinutes);
   const intervalVolume = useAppStore((s) => s.intervalVolume);
+  const intervalRepeatCount = useAppStore((s) => s.intervalRepeatCount);
   const setIsIntervalPreviewing = useAppStore((s) => s.setIsIntervalPreviewing);
 
   // ── Sync playback state ──
@@ -78,8 +79,13 @@ export function useAudioEngine(): void {
   // ── Sync interval layer ──
   useEffect(() => {
     const effectiveMinutes = intervalEnabled ? intervalMinutes : 0;
-    AudioEngine.getInstance().setIntervalConfig(intervalTone, effectiveMinutes, intervalVolume);
-  }, [intervalEnabled, intervalTone, intervalMinutes, intervalVolume]);
+    AudioEngine.getInstance().setIntervalConfig(
+      intervalTone,
+      effectiveMinutes,
+      intervalVolume,
+      intervalRepeatCount,
+    );
+  }, [intervalEnabled, intervalTone, intervalMinutes, intervalVolume, intervalRepeatCount]);
 
   useEffect(() => {
     AudioEngine.getInstance().onIntervalPreviewChange((previewing) => {

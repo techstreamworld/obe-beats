@@ -1,4 +1,4 @@
 {
-  "version": 152,
-  "lastUpdate": "Fix restart live playback race on reset, stack interval sound under ambient sound"
+  "version": 153,
+  "lastUpdate": "Interval repeats 1-5x with progressive volume, lowered interval default sound, WBTB 25m, randomized meditation nature sound"
 }

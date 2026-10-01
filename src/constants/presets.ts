@@ -19,6 +19,7 @@ export interface PresetDefinition {
   intervalTone: IntervalTone;
   intervalMinutes: number;
   intervalVolume: number;
+  intervalRepeatCount: number;
   exportFormat: ExportFormat;
 }
 
@@ -42,13 +43,14 @@ export const PRESETS: PresetDefinition[] = [
     intervalTone: 'bell',
     intervalMinutes: 15,
     intervalVolume: 0.5,
+    intervalRepeatCount: 3,
     exportFormat: 'wav',
   },
   {
     id: 'protocol-2',
     name: 'Protocol 2',
     tagline: 'Deep Rest & Brown Noise',
-    badge: 'Brown Noise • 3h • 90m Beep • MP3',
+    badge: 'Brown Noise • 3h • 90m Beep (5×) • MP3',
     binauralEnabled: false, // no binaural beat
     binauralVolume: 0.5,
     carrierFrequency: 150,
@@ -63,13 +65,14 @@ export const PRESETS: PresetDefinition[] = [
     intervalTone: 'beep', // double beep
     intervalMinutes: 90, // each 90 mins
     intervalVolume: 0.5,
+    intervalRepeatCount: 5,
     exportFormat: 'mp3-192', // mp3 192 good
   },
   {
     id: 'wbtb',
     name: 'WBTB',
     tagline: 'Wake Back To Bed Lucid State',
-    badge: '6.0 Hz Theta • 250 Hz • 30m',
+    badge: '6.0 Hz Theta • 250 Hz • 25m',
     binauralEnabled: true,
     binauralVolume: 0.5,
     carrierFrequency: 250,
@@ -77,20 +80,21 @@ export const PRESETS: PresetDefinition[] = [
     masterVolume: 0.5,
     leftVolume: 1.0,
     rightVolume: 1.0,
-    timerDurationSeconds: 30 * 60,
+    timerDurationSeconds: 25 * 60,
     ambientEnabled: false,
     ambientLayers: [{ id: 'layer-1', soundId: null, volume: 0.5 }],
     intervalEnabled: false,
     intervalTone: 'bell',
     intervalMinutes: 15,
     intervalVolume: 0.5,
+    intervalRepeatCount: 3,
     exportFormat: 'wav',
   },
   {
     id: 'meditation',
     name: 'Meditation',
     tagline: 'Theta Relaxation & Rain',
-    badge: '6.0 Hz Theta • 250 Hz • Rain • 30m',
+    badge: '6.0 Hz Theta • 250 Hz • Nature • 30m',
     binauralEnabled: true,
     binauralVolume: 0.5,
     carrierFrequency: 250,
@@ -105,6 +109,7 @@ export const PRESETS: PresetDefinition[] = [
     intervalTone: 'bell',
     intervalMinutes: 15,
     intervalVolume: 0.5,
+    intervalRepeatCount: 3,
     exportFormat: 'wav',
   },
 ];

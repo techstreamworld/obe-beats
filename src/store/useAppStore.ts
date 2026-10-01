@@ -32,6 +32,7 @@ const DEFAULT_STATE = {
   intervalTone: 'bell' as IntervalTone,
   intervalMinutes: 15,
   intervalVolume: 0.5,
+  intervalRepeatCount: 3,
   isIntervalPreviewing: false,
   exportFormat: 'wav' as ExportFormat,
   exportStatus: 'idle' as ExportStatus,
@@ -96,11 +97,13 @@ export interface AppState {
   intervalTone: IntervalTone;
   intervalMinutes: number;
   intervalVolume: number;
+  intervalRepeatCount: number;
   isIntervalPreviewing: boolean;
   setIntervalEnabled: (enabled: boolean) => void;
   setIntervalTone: (tone: IntervalTone) => void;
   setIntervalMinutes: (minutes: number) => void;
   setIntervalVolume: (v: number) => void;
+  setIntervalRepeatCount: (count: number) => void;
   setIsIntervalPreviewing: (previewing: boolean) => void;
 
   // Legacy ambient compatibility
@@ -133,6 +136,17 @@ export const useAppStore = create<AppState>((set, get) => ({
   applyPreset: (presetId: string) => {
     const preset = PRESETS.find((p) => p.id === presetId);
     if (!preset) return;
+
+    // The meditation preset will now choose a different random ambient nature sound each time it's clicked
+    let ambientLayers = preset.ambientLayers;
+    if (preset.id === 'meditation') {
+      const NATURE_SOUNDS = ['rain', 'forest-rain', 'ocean-waves'];
+      const currentSound = get().ambientLayers[0]?.soundId;
+      const candidates = NATURE_SOUNDS.filter((s) => s !== currentSound);
+      const chosen = candidates[Math.floor(Math.random() * candidates.length)] || NATURE_SOUNDS[0];
+      ambientLayers = [{ id: 'layer-1', soundId: chosen, volume: 0.5 }];
+    }
+
     set((state) => ({
       activePresetId: preset.id,
       binauralEnabled: preset.binauralEnabled,
@@ -148,11 +162,12 @@ export const useAppStore = create<AppState>((set, get) => ({
         isRunning: state.playback === 'playing',
       },
       ambientEnabled: preset.ambientEnabled,
-      ambientLayers: preset.ambientLayers,
+      ambientLayers,
       intervalEnabled: preset.intervalEnabled,
       intervalTone: preset.intervalTone,
       intervalMinutes: preset.intervalMinutes,
       intervalVolume: preset.intervalVolume,
+      intervalRepeatCount: preset.intervalRepeatCount ?? 3,
       exportFormat: preset.exportFormat,
     }));
   },
@@ -182,6 +197,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       intervalTone: 'bell',
       intervalMinutes: 15,
       intervalVolume: 0.5,
+      intervalRepeatCount: 3,
       isIntervalPreviewing: false,
       exportFormat: 'wav',
       exportStatus: 'idle',
@@ -248,6 +264,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setIntervalTone: (tone) => set({ intervalTone: tone, activePresetId: null }),
   setIntervalMinutes: (min) => set({ intervalMinutes: min, activePresetId: null }),
   setIntervalVolume: (v) => set({ intervalVolume: v }),
+  setIntervalRepeatCount: (count) => set({ intervalRepeatCount: count, activePresetId: null }),
   setIsIntervalPreviewing: (previewing) => set({ isIntervalPreviewing: previewing }),
 
   // Legacy ambient compatibility

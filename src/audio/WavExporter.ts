@@ -25,6 +25,7 @@ export interface RenderOptions {
   intervalTone?: IntervalTone;
   intervalMinutes?: number;
   intervalVolume?: number;
+  intervalRepeatCount?: number;
   durationSeconds: number;
   fadeInSeconds: number;
   fadeOutSeconds: number;
@@ -181,7 +182,10 @@ export class WavExporter {
       const toneDuration = intervalBuffer.duration;
       const pauseSec = 2.0;
       const strikeInterval = toneDuration + pauseSec;
-      const multipliers = [0.40, 0.70, 1.00];
+      const count = Math.max(1, Math.min(5, Math.floor(options.intervalRepeatCount || 3)));
+      const multipliers = count === 1
+        ? [1.0]
+        : Array.from({ length: count }, (_, i) => 0.40 + (0.60 * i) / (count - 1));
       const baseVol = options.intervalVolume ?? 0.5;
 
       let triggerTime = intervalSec;

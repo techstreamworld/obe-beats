@@ -22,6 +22,7 @@ export function ExportButton() {
   const intervalTone = useAppStore((s) => s.intervalTone);
   const intervalMinutes = useAppStore((s) => s.intervalMinutes);
   const intervalVolume = useAppStore((s) => s.intervalVolume);
+  const intervalRepeatCount = useAppStore((s) => s.intervalRepeatCount);
   const fadeInSeconds = useAppStore((s) => s.fadeInSeconds);
   const fadeOutSeconds = useAppStore((s) => s.fadeOutSeconds);
   const timerDurationSeconds = useAppStore((s) => s.timerDurationSeconds);
@@ -64,6 +65,7 @@ export function ExportButton() {
           intervalTone,
           intervalMinutes: intervalEnabled ? intervalMinutes : 0,
           intervalVolume,
+          intervalRepeatCount,
           durationSeconds: exportDuration,
           fadeInSeconds,
           fadeOutSeconds,

@@ -11,17 +11,27 @@ const TONE_OPTIONS: { id: IntervalTone; label: string }[] = [
   { id: 'waves', label: 'Waves' },
 ];
 
+const REPEAT_OPTIONS = [
+  { value: 1, label: '1×' },
+  { value: 2, label: '2×' },
+  { value: 3, label: '3× (Default)' },
+  { value: 4, label: '4×' },
+  { value: 5, label: '5×' },
+];
+
 export function IntervalPanel() {
   const intervalEnabled = useAppStore((s) => s.intervalEnabled);
   const setIntervalEnabled = useAppStore((s) => s.setIntervalEnabled);
   const intervalMinutes = useAppStore((s) => s.intervalMinutes);
   const intervalTone = useAppStore((s) => s.intervalTone);
   const intervalVolume = useAppStore((s) => s.intervalVolume);
+  const intervalRepeatCount = useAppStore((s) => s.intervalRepeatCount);
   const isIntervalPreviewing = useAppStore((s) => s.isIntervalPreviewing);
 
   const setIntervalMinutes = useAppStore((s) => s.setIntervalMinutes);
   const setIntervalTone = useAppStore((s) => s.setIntervalTone);
   const setIntervalVolume = useAppStore((s) => s.setIntervalVolume);
+  const setIntervalRepeatCount = useAppStore((s) => s.setIntervalRepeatCount);
   const setIsIntervalPreviewing = useAppStore((s) => s.setIsIntervalPreviewing);
 
   const parseMinutes = (str: string) => {
@@ -43,7 +53,7 @@ export function IntervalPanel() {
       setIsIntervalPreviewing(false);
     } else {
       setIsIntervalPreviewing(true);
-      await AudioEngine.getInstance().previewInterval(intervalTone, intervalVolume);
+      await AudioEngine.getInstance().previewInterval(intervalTone, intervalVolume, intervalRepeatCount);
     }
   };
 
@@ -77,6 +87,23 @@ export function IntervalPanel() {
             >
               {TONE_OPTIONS.map((opt) => (
                 <option key={opt.id} value={opt.id}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Repeat count selection dropdown */}
+          <div className="control-row">
+            <label htmlFor="interval-repeat-select">Repeats</label>
+            <select
+              id="interval-repeat-select"
+              className="interval-select"
+              value={intervalRepeatCount}
+              onChange={(e) => setIntervalRepeatCount(Number(e.target.value))}
+            >
+              {REPEAT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
@@ -142,7 +169,7 @@ export function IntervalPanel() {
               onClick={handleTogglePreview}
               title="Preview interval tone sequence"
             >
-              {isIntervalPreviewing ? '⏹ Stop Preview' : '▶ Preview Interval (3x)'}
+              {isIntervalPreviewing ? '⏹ Stop Preview' : `▶ Preview Interval (${intervalRepeatCount}×)`}
             </button>
           </div>
         </div>

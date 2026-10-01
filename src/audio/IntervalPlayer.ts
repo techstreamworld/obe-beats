@@ -12,6 +12,7 @@ export class IntervalPlayer {
   private tone: IntervalTone = 'bell';
   private intervalMinutes = 0;
   private volume = 0.5;
+  private repeatCount = 3;
   private isPlaying = false;
 
   private activeSources: AudioBufferSourceNode[] = [];
@@ -42,13 +43,14 @@ export class IntervalPlayer {
   }
 
   /**
-   * Updates tone, interval duration in minutes, and layer volume.
+   * Updates tone, interval duration in minutes, layer volume, and repeat count.
    */
-  setConfig(tone: IntervalTone, intervalMinutes: number, volume: number): void {
+  setConfig(tone: IntervalTone, intervalMinutes: number, volume: number, repeatCount = 3): void {
     this.tone = tone;
     const oldMinutes = this.intervalMinutes;
     this.intervalMinutes = intervalMinutes;
     this.volume = volume;
+    this.repeatCount = repeatCount;
 
     if (this.isPlaying && intervalMinutes > 0) {
       const elapsed = Math.max(0, this.ctx.currentTime - this.sessionStartAudioTime);
@@ -88,16 +90,21 @@ export class IntervalPlayer {
 
     const elapsed = this.ctx.currentTime - this.sessionStartAudioTime;
     if (this.nextIntervalSec > 0 && elapsed >= this.nextIntervalSec) {
-      this.playSequence(this.tone, this.volume);
+      this.playSequence(this.tone, this.volume, this.repeatCount);
       this.nextIntervalSec += this.intervalMinutes * 60;
     }
   }
 
   /**
-   * Plays the tone 3 times with a 2-second pause in between, getting progressively louder.
-   * Multipliers: 0.40 (strike 1) → 0.70 (strike 2) → 1.00 (strike 3).
+   * Plays the tone N times (1 to 5) with a 2-second pause in between, getting progressively louder.
+   * Volume scales up slightly with each play up to the target volume.
    */
-  playSequence(tone: IntervalTone, volume: number, isPreview = false): void {
+  playSequence(
+    tone: IntervalTone,
+    volume: number,
+    repeatCount = this.repeatCount,
+    isPreview = false,
+  ): void {
     if (volume <= 0) return;
     this.stopActiveStrikes();
 
@@ -106,9 +113,12 @@ export class IntervalPlayer {
     const pauseSeconds = 2.0;
     const strikeInterval = toneDuration + pauseSeconds;
 
+    const count = Math.max(1, Math.min(5, Math.floor(repeatCount || 3)));
+    const multipliers = count === 1
+      ? [1.0]
+      : Array.from({ length: count }, (_, i) => 0.40 + (0.60 * i) / (count - 1));
+
     const baseTime = this.ctx.currentTime;
-    // Progressively louder across 3 strikes
-    const multipliers = [0.40, 0.70, 1.00];
 
     multipliers.forEach((mult, index) => {
       const strikeTime = baseTime + index * strikeInterval;
@@ -147,13 +157,13 @@ export class IntervalPlayer {
   }
 
   /**
-   * Preview helper to immediately hear the 3 progressively louder strikes.
+   * Preview helper to immediately hear the progressively louder strikes.
    */
-  async startPreview(): Promise<void> {
+  async startPreview(repeatCount = this.repeatCount): Promise<void> {
     if (this.ctx.state === 'suspended') {
       await this.ctx.resume();
     }
-    this.playSequence(this.tone, this.volume, true);
+    this.playSequence(this.tone, this.volume, repeatCount, true);
   }
 
   /** Stops any ongoing preview or active strikes. */

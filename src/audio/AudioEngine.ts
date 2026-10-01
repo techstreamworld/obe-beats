@@ -38,6 +38,7 @@ export class AudioEngine {
   private intervalTone: IntervalTone = 'bell';
   private intervalMinutes = 0;
   private intervalVolume = 0.5;
+  private intervalRepeatCount = 3;
   private previewChangeCallback?: (previewing: boolean) => void;
 
   private _playing = false;
@@ -80,7 +81,7 @@ export class AudioEngine {
       }
 
       this.intervalPlayer = new IntervalPlayer(this.ctx, this.masterGain);
-      this.intervalPlayer.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume);
+      this.intervalPlayer.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume, this.intervalRepeatCount);
       if (this.previewChangeCallback) {
         this.intervalPlayer.onPreviewChange(this.previewChangeCallback);
       }
@@ -281,11 +282,12 @@ export class AudioEngine {
 
   // ── Interval Audio Layer ──
 
-  setIntervalConfig(tone: IntervalTone, intervalMinutes: number, volume: number): void {
+  setIntervalConfig(tone: IntervalTone, intervalMinutes: number, volume: number, repeatCount = 3): void {
     this.intervalTone = tone;
     this.intervalMinutes = intervalMinutes;
     this.intervalVolume = volume;
-    this.intervalPlayer?.setConfig(tone, intervalMinutes, volume);
+    this.intervalRepeatCount = repeatCount;
+    this.intervalPlayer?.setConfig(tone, intervalMinutes, volume, repeatCount);
   }
 
   onIntervalPreviewChange(cb: (previewing: boolean) => void): void {
@@ -293,12 +295,18 @@ export class AudioEngine {
     this.intervalPlayer?.onPreviewChange(cb);
   }
 
-  async previewInterval(tone?: IntervalTone, volume?: number): Promise<void> {
+  async previewInterval(tone?: IntervalTone, volume?: number, repeatCount?: number): Promise<void> {
     await this.ensureContext();
     if (tone) this.intervalTone = tone;
     if (volume !== undefined) this.intervalVolume = volume;
-    this.intervalPlayer?.setConfig(this.intervalTone, this.intervalMinutes, this.intervalVolume);
-    await this.intervalPlayer?.startPreview();
+    if (repeatCount !== undefined) this.intervalRepeatCount = repeatCount;
+    this.intervalPlayer?.setConfig(
+      this.intervalTone,
+      this.intervalMinutes,
+      this.intervalVolume,
+      this.intervalRepeatCount,
+    );
+    await this.intervalPlayer?.startPreview(this.intervalRepeatCount);
   }
 
   stopIntervalPreview(): void {
@@ -333,7 +341,8 @@ export class AudioEngine {
     this._binauralEnabled = true;
     this._ambientEnabled = false;
     this._ambientLayers = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
-    this.intervalPlayer?.setConfig('bell', 0, 0.5);
+    this.intervalRepeatCount = 3;
+    this.intervalPlayer?.setConfig('bell', 0, 0.5, 3);
     if (this.masterGain && this.ctx) {
       this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
       this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
