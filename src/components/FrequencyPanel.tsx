@@ -69,10 +69,10 @@ export function FrequencyPanel() {
         {binauralEnabled && (
           <span
             className="wave-badge"
-            title={`${currentBand.name} waves (${currentBand.range})`}
-            aria-label={`Current brainwave band: ${currentBand.name} waves, range ${currentBand.range}`}
+            title={`${currentBand.name} (${currentBand.range})`}
+            aria-label={`Current brainwave band: ${currentBand.name}, range ${currentBand.range}`}
           >
-            {currentBand.name} Waves
+            {currentBand.name}
           </span>
         )}
       </div>

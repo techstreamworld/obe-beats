@@ -1,4 +1,4 @@
 {
-  "version": 209,
-  "lastUpdate": "Playback bar with seeking & interval indicators, brainwave badge to top right, tone volume at bottom, numerical-only inputs with unit brackets"
+  "version": 210,
+  "lastUpdate": "Combine Left/Right ear sliders into single centered balance slider, show brainwave name only and make badge prominent"
 }

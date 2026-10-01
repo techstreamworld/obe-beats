@@ -12,6 +12,36 @@ import type {
 
 // ── Default State Values ──
 
+/** Converts 0-100 ear balance (0 = Left, 50 = Center, 100 = Right) to { leftVolume, rightVolume } */
+export function balanceToVolumes(balance: number): { leftVolume: number; rightVolume: number } {
+  const clamped = Math.max(0, Math.min(100, balance));
+  if (clamped <= 50) {
+    return {
+      leftVolume: 1.0,
+      rightVolume: Math.round((clamped / 50) * 100) / 100,
+    };
+  } else {
+    return {
+      leftVolume: Math.round(((100 - clamped) / 50) * 100) / 100,
+      rightVolume: 1.0,
+    };
+  }
+}
+
+/** Converts left/right volumes back to 0-100 ear balance */
+export function volumesToBalance(left: number, right: number): number {
+  if (left >= 0.999 && right >= 0.999) return 50;
+  if (left >= 0.999) {
+    return Math.round(right * 50);
+  }
+  if (right >= 0.999) {
+    return Math.round(100 - left * 50);
+  }
+  const total = left + right;
+  if (total <= 0) return 50;
+  return Math.round((right / total) * 100);
+}
+
 const DEFAULT_STATE = {
   playback: 'stopped' as PlaybackState,
   restartKey: 0,
@@ -22,6 +52,7 @@ const DEFAULT_STATE = {
   masterVolume: 0.5,
   leftVolume: 1,
   rightVolume: 1,
+  earBalance: 50,
   timerDurationSeconds: 0,
   fadeInSeconds: 3,
   fadeOutSeconds: 3,
@@ -72,9 +103,11 @@ export interface AppState {
   masterVolume: number;
   leftVolume: number;
   rightVolume: number;
+  earBalance: number;
   setMasterVolume: (v: number) => void;
   setLeftVolume: (v: number) => void;
   setRightVolume: (v: number) => void;
+  setEarBalance: (balance: number) => void;
 
   // Timer & fades
   timerDurationSeconds: number;
@@ -159,6 +192,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       masterVolume: preset.masterVolume,
       leftVolume: preset.leftVolume,
       rightVolume: preset.rightVolume,
+      earBalance: volumesToBalance(preset.leftVolume, preset.rightVolume),
       timerDurationSeconds: preset.timerDurationSeconds,
       timerState: {
         remainingSeconds: preset.timerDurationSeconds,
@@ -196,6 +230,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       masterVolume: 0.5,
       leftVolume: 1,
       rightVolume: 1,
+      earBalance: 50,
       timerDurationSeconds: 0,
       timerState: { remainingSeconds: 0, isRunning: false },
       ambientEnabled: false,
@@ -220,8 +255,28 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Volumes
   setMasterVolume: (v) => set({ masterVolume: v }),
-  setLeftVolume: (v) => set({ leftVolume: v, activePresetId: null }),
-  setRightVolume: (v) => set({ rightVolume: v, activePresetId: null }),
+  setLeftVolume: (v) =>
+    set((state) => ({
+      leftVolume: v,
+      earBalance: volumesToBalance(v, state.rightVolume),
+      activePresetId: null,
+    })),
+  setRightVolume: (v) =>
+    set((state) => ({
+      rightVolume: v,
+      earBalance: volumesToBalance(state.leftVolume, v),
+      activePresetId: null,
+    })),
+  setEarBalance: (balance: number) => {
+    const clamped = Math.max(0, Math.min(100, balance));
+    const { leftVolume, rightVolume } = balanceToVolumes(clamped);
+    set({
+      earBalance: clamped,
+      leftVolume,
+      rightVolume,
+      activePresetId: null,
+    });
+  },
 
   // Timer & fades
   setTimerDuration: (s) => set({ timerDurationSeconds: s, activePresetId: null }),
