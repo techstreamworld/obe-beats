@@ -128,4 +128,29 @@ export function useTimer(): void {
     }
     prevDurationRef.current = timerDuration;
   }, [timerDuration, playback]);
+
+  // Seek effect: coordinates countdown, audio engine, and fade triggers
+  const seekRequest = useAppStore((s) => s.seekRequest);
+  const prevSeekKeyRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!seekRequest || seekRequest.key === prevSeekKeyRef.current) return;
+    prevSeekKeyRef.current = seekRequest.key;
+
+    const { elapsedSeconds } = seekRequest;
+    const totalDuration = timerDurationRef.current;
+    const newRemaining = Math.max(0, totalDuration - elapsedSeconds);
+
+    if (timerRef.current && totalDuration > 0) {
+      timerRef.current.seek(newRemaining);
+    } else {
+      updateTimerState({ remainingSeconds: newRemaining });
+    }
+
+    fadeOutTriggered.current = fadeOutSeconds > 0 && newRemaining <= fadeOutSeconds;
+
+    const engine = AudioEngine.getInstance();
+    engine.seek(elapsedSeconds, totalDuration);
+  }, [seekRequest, fadeOutSeconds, updateTimerState]);
 }
+

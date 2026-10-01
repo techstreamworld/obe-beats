@@ -102,7 +102,7 @@ export function AmbientPanel() {
                 {isSelected && (
                   <div className="control-row ambient-volume-row">
                     <label htmlFor={`ambient-volume-${layer.id}`}>
-                      {ambientLayers.length > 1 ? `Sound ${index + 1} Volume` : 'Volume'}
+                      {ambientLayers.length > 1 ? `Sound ${index + 1} Volume (%)` : 'Volume (%)'}
                     </label>
                     <div className="slider-group">
                       <input
@@ -118,10 +118,10 @@ export function AmbientPanel() {
                         value={layer.volume}
                         min={0}
                         max={1}
-                        formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                        formatDisplay={(v) => `${Math.round(v * 100)}`}
                         parseInput={parsePercent}
                         onCommit={(v) => setAmbientLayerVolume(layer.id, v)}
-                        ariaLabel={`${layerTitle} volume percentage. Type value and press Enter.`}
+                        ariaLabel={`${layerTitle} volume percentage. Type numerical value and press Enter.`}
                       />
                     </div>
                   </div>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
 import './TimerPanel.css';
@@ -14,6 +15,9 @@ function formatTime(totalSeconds: number): string {
 }
 
 export function TimerPanel() {
+  const playback = useAppStore((s) => s.playback);
+  const seek = useAppStore((s) => s.seek);
+
   const timerDuration = useAppStore((s) => s.timerDurationSeconds);
   const timerState = useAppStore((s) => s.timerState);
   const setTimerDuration = useAppStore((s) => s.setTimerDuration);
@@ -26,14 +30,33 @@ export function TimerPanel() {
   const setLeftVolume = useAppStore((s) => s.setLeftVolume);
   const setRightVolume = useAppStore((s) => s.setRightVolume);
 
+  const intervalEnabled = useAppStore((s) => s.intervalEnabled);
+  const intervalMinutes = useAppStore((s) => s.intervalMinutes);
+
+  // Local scrub state for the playback seek bar
+  const [scrubValue, setScrubValue] = useState<number | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+
+  // Compute current elapsed playback seconds
+  const elapsedSeconds =
+    timerDuration > 0
+      ? Math.max(0, timerDuration - timerState.remainingSeconds)
+      : 0;
+
+  const displayElapsed =
+    isScrubbing && scrubValue !== null ? scrubValue : elapsedSeconds;
+
+  // Compute interval marker timestamps in seconds
+  const intervalMarkers: number[] = [];
+  if (intervalEnabled && intervalMinutes > 0 && timerDuration > 0) {
+    const step = intervalMinutes * 60;
+    for (let t = step; t < timerDuration; t += step) {
+      intervalMarkers.push(t);
+    }
+  }
+
   // Convert stored seconds to minutes for slider & inputs (up to 180 min / 3 hours)
   const durationMinutes = Math.round(timerDuration / 60);
-
-  const parseSecondsOrOff = (str: string) => {
-    if (str.toLowerCase().includes('off') || str.trim() === '0') return 0;
-    const num = parseInt(str.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? null : num;
-  };
 
   const parsePercent = (str: string) => {
     const num = parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -41,46 +64,90 @@ export function TimerPanel() {
     return Math.min(1, Math.max(0, Math.round(num) / 100));
   };
 
+  const handleSeekCommit = (val: number) => {
+    seek(val);
+    setIsScrubbing(false);
+    setScrubValue(null);
+  };
+
   return (
     <div className="timer-panel">
-      {/* Countdown and Session Duration row (Max 3 hours / 180 min) */}
-      <div className="timer-header-row">
-        <div className="countdown" aria-live="polite" aria-label="Time remaining">
-          {timerState.remainingSeconds > 0
-            ? formatTime(timerState.remainingSeconds)
-            : timerDuration > 0
-              ? formatTime(timerDuration)
-              : '--:--'}
-        </div>
-
-        <div className="control-row session-duration-row">
-          <label htmlFor="timer-duration">Session Duration</label>
-          <div className="slider-group">
-            <input
-              id="timer-duration"
-              type="range"
-              min={0}
-              max={180}
-              step={5}
-              value={durationMinutes}
-              onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
-            />
-            <CommitInput
-              value={durationMinutes}
-              min={0}
-              max={180}
-              formatDisplay={(min) => (min > 0 ? `${min} min` : 'Off')}
-              parseInput={parseSecondsOrOff}
-              onCommit={(min) => setTimerDuration(min * 60)}
-              ariaLabel="Session duration in minutes (up to 180 min / 3 hours). Type value and press Enter."
-            />
+      {/* Playback Seek Bar — shown when audio plays/is active */}
+      {playback !== 'stopped' && timerDuration > 0 && (
+        <div className="playback-bar-section" aria-label="Playback Progress and Seeking">
+          <div className="playback-bar-header">
+            <span className="playback-bar-title">Session Playback</span>
+            <span className="playback-bar-time" aria-live="polite">
+              {formatTime(displayElapsed)} / {formatTime(timerDuration)}
+            </span>
           </div>
+          <div className="playback-slider-container">
+            <input
+              type="range"
+              className="playback-slider"
+              min={0}
+              max={timerDuration}
+              step={1}
+              value={displayElapsed}
+              onPointerDown={() => setIsScrubbing(true)}
+              onChange={(e) => setScrubValue(Number(e.target.value))}
+              onPointerUp={(e) =>
+                handleSeekCommit(Number((e.target as HTMLInputElement).value))
+              }
+              onKeyUp={(e) =>
+                handleSeekCommit(Number((e.target as HTMLInputElement).value))
+              }
+              aria-label="Seek session playback. Drag to jump to any time point."
+            />
+            {intervalEnabled && intervalMinutes > 0 && (
+              <div className="interval-indicators-layer" aria-hidden="true">
+                {intervalMarkers.map((sec) => (
+                  <div
+                    key={sec}
+                    className="interval-bar-indicator"
+                    style={{
+                      left: `calc(9px + (100% - 18px) * ${sec / timerDuration})`,
+                    }}
+                    title={`Interval indicator at ${formatTime(sec)}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Session Duration row (Max 3 hours / 180 min) */}
+      <div className="control-row session-duration-row">
+        <label htmlFor="timer-duration">Session Duration (min)</label>
+        <div className="slider-group">
+          <input
+            id="timer-duration"
+            type="range"
+            min={0}
+            max={180}
+            step={5}
+            value={durationMinutes}
+            onChange={(e) => setTimerDuration(Number(e.target.value) * 60)}
+          />
+          <CommitInput
+            value={durationMinutes}
+            min={0}
+            max={180}
+            formatDisplay={(min) => `${min}`}
+            parseInput={(str) => {
+              const num = parseInt(str.replace(/[^0-9]/g, ''), 10);
+              return isNaN(num) ? null : num;
+            }}
+            onCommit={(min) => setTimerDuration(min * 60)}
+            ariaLabel="Session duration in minutes (0 to 180 min). Type numerical value and press Enter."
+          />
         </div>
       </div>
 
       {/* Master Volume */}
       <div className="control-row master-volume-row">
-        <label htmlFor="vol-master">Master Volume</label>
+        <label htmlFor="vol-master">Master Volume (%)</label>
         <div className="slider-group">
           <input
             id="vol-master"
@@ -95,17 +162,17 @@ export function TimerPanel() {
             value={masterVolume}
             min={0}
             max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setMasterVolume(v)}
-            ariaLabel="Master volume percentage. Type value and press Enter."
+            ariaLabel="Master volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>
 
       {/* Left Ear Volume */}
       <div className="control-row ear-volume-row">
-        <label htmlFor="vol-left">Left Ear</label>
+        <label htmlFor="vol-left">Left Ear (%)</label>
         <div className="slider-group">
           <input
             id="vol-left"
@@ -120,17 +187,17 @@ export function TimerPanel() {
             value={leftVolume}
             min={0}
             max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setLeftVolume(v)}
-            ariaLabel="Left ear volume percentage."
+            ariaLabel="Left ear volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>
 
       {/* Right Ear Volume */}
       <div className="control-row ear-volume-row">
-        <label htmlFor="vol-right">Right Ear</label>
+        <label htmlFor="vol-right">Right Ear (%)</label>
         <div className="slider-group">
           <input
             id="vol-right"
@@ -145,10 +212,10 @@ export function TimerPanel() {
             value={rightVolume}
             min={0}
             max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setRightVolume(v)}
-            ariaLabel="Right ear volume percentage."
+            ariaLabel="Right ear volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>

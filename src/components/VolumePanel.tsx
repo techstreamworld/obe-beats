@@ -20,7 +20,7 @@ export function VolumePanel() {
     <div className="volume-panel">
       {/* Master Volume */}
       <div className="control-row">
-        <label htmlFor="vol-master">Master Volume</label>
+        <label htmlFor="vol-master">Master Volume (%)</label>
         <div className="slider-group">
           <input
             id="vol-master"
@@ -35,10 +35,10 @@ export function VolumePanel() {
             value={masterVolume}
             min={0}
             max={1}
-            formatDisplay={(v) => `${Math.round(v * 100)}%`}
+            formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setMasterVolume(v)}
-            ariaLabel="Master volume percentage. Type value and press Enter."
+            ariaLabel="Master volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>
@@ -46,7 +46,7 @@ export function VolumePanel() {
       {/* Left and Right Ear side-by-side (half-size sliders) */}
       <div className="ear-balance-row">
         <div className="control-row ear-half">
-          <label htmlFor="vol-left">Left Ear</label>
+          <label htmlFor="vol-left">Left Ear (%)</label>
           <div className="slider-group">
             <input
               id="vol-left"
@@ -61,16 +61,16 @@ export function VolumePanel() {
               value={leftVolume}
               min={0}
               max={1}
-              formatDisplay={(v) => `${Math.round(v * 100)}%`}
+              formatDisplay={(v) => `${Math.round(v * 100)}`}
               parseInput={parsePercent}
               onCommit={(v) => setLeftVolume(v)}
-              ariaLabel="Left ear volume percentage."
+              ariaLabel="Left ear volume percentage. Type numerical value and press Enter."
             />
           </div>
         </div>
 
         <div className="control-row ear-half">
-          <label htmlFor="vol-right">Right Ear</label>
+          <label htmlFor="vol-right">Right Ear (%)</label>
           <div className="slider-group">
             <input
               id="vol-right"
@@ -85,10 +85,10 @@ export function VolumePanel() {
               value={rightVolume}
               min={0}
               max={1}
-              formatDisplay={(v) => `${Math.round(v * 100)}%`}
+              formatDisplay={(v) => `${Math.round(v * 100)}`}
               parseInput={parsePercent}
               onCommit={(v) => setRightVolume(v)}
-              ariaLabel="Right ear volume percentage."
+              ariaLabel="Right ear volume percentage. Type numerical value and press Enter."
             />
           </div>
         </div>

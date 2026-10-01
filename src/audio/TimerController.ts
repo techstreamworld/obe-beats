@@ -53,6 +53,17 @@ export class TimerController {
     this.onTick(this.remaining);
   }
 
+  /** Seek countdown to a specific remaining seconds value. */
+  seek(newRemainingSeconds: number): void {
+    this.remaining = Math.max(0, newRemainingSeconds);
+    this.onTick(this.remaining);
+
+    if (this.remaining <= 0) {
+      this.stop();
+      this.onExpiry();
+    }
+  }
+
   /** Pause the countdown interval without wiping remaining seconds. */
   pause(): void {
     if (this.intervalId !== null) {

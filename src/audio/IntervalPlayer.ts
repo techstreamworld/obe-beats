@@ -85,6 +85,18 @@ export class IntervalPlayer {
     }
   }
 
+  /** Seek interval monitoring to a specific elapsed session time. */
+  seek(elapsedSeconds: number): void {
+    this.sessionStartAudioTime = this.ctx.currentTime - elapsedSeconds;
+    if (this.intervalMinutes > 0) {
+      const intervalSec = this.intervalMinutes * 60;
+      this.nextIntervalSec = (Math.floor(elapsedSeconds / intervalSec) + 1) * intervalSec;
+    } else {
+      this.nextIntervalSec = 0;
+    }
+    this.stopActiveStrikes();
+  }
+
   private checkIntervalTrigger(): void {
     if (!this.isPlaying || this.intervalMinutes <= 0 || this.volume <= 0) return;
 

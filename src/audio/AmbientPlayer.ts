@@ -316,6 +316,97 @@ export class AmbientPlayer {
     }
   }
 
+  /** Seek playback position to a specific elapsed point in seconds. */
+  seek(elapsedSeconds: number, sessionDuration?: number): void {
+    if (sessionDuration !== undefined) {
+      this.sessionDuration = sessionDuration;
+    }
+    this.sessionStartTime = this.ctx.currentTime - elapsedSeconds;
+    const sessionEndTime = this.sessionDuration > 0
+      ? this.sessionStartTime + this.sessionDuration
+      : Infinity;
+
+    for (const layer of this.layers.values()) {
+      // 1. Stop current in-flight loop instances
+      for (const loop of layer.activeLoops) {
+        try {
+          loop.source.stop();
+          loop.source.disconnect();
+          loop.crossGain.disconnect();
+        } catch {
+          // ignore
+        }
+      }
+      layer.activeLoops = [];
+
+      // 2. If noise layer, update stop time
+      if (layer.noiseSourceNode) {
+        if (sessionEndTime < Infinity) {
+          try {
+            layer.noiseSourceNode.stop(sessionEndTime);
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      // 3. If audio file layer, restart loop at the correct offset
+      if (this._isPlaying && layer.currentBuffer) {
+        const buffer = layer.currentBuffer;
+        const D = buffer.duration;
+        const X = Math.min(10.0, D / 2);
+        const stepTime = D - X;
+
+        const offsetInStep = elapsedSeconds % stepTime;
+        const bufferOffset = offsetInStep;
+        const remainingPlay = D - bufferOffset;
+        const tStart = this.ctx.currentTime;
+        const tStop = Math.min(sessionEndTime, tStart + remainingPlay);
+
+        if (tStop > tStart) {
+          const crossGain = this.ctx.createGain();
+          crossGain.connect(layer.gainNode);
+          crossGain.gain.setValueAtTime(1.0, tStart);
+
+          const source = this.ctx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(crossGain);
+          source.start(tStart, bufferOffset);
+          source.stop(tStop);
+
+          const instance: LoopInstance = {
+            source,
+            crossGain,
+            startTime: tStart,
+            stopTime: tStop,
+          };
+          layer.activeLoops.push(instance);
+
+          source.onended = () => {
+            try {
+              source.disconnect();
+              crossGain.disconnect();
+            } catch {
+              // ignore
+            }
+            const idx = layer.activeLoops.indexOf(instance);
+            if (idx !== -1) {
+              layer.activeLoops.splice(idx, 1);
+            }
+          };
+
+          layer.nextLoopStartTime = tStart + (stepTime - offsetInStep);
+          layer.isFirstLoop = false;
+        } else {
+          layer.nextLoopStartTime = tStart;
+          layer.isFirstLoop = false;
+        }
+
+        this.scheduleLayerLoops(layer);
+      }
+    }
+  }
+
   /** Stop all ambient sound playback. */
   stop(): void {
     this._isPlaying = false;

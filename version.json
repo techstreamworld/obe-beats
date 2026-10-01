@@ -1,4 +1,4 @@
 {
-  "version": 208,
-  "lastUpdate": "Move version badge to bottom right corner, expand layout width, fix ear slider layout"
+  "version": 209,
+  "lastUpdate": "Playback bar with seeking & interval indicators, brainwave badge to top right, tone volume at bottom, numerical-only inputs with unit brackets"
 }

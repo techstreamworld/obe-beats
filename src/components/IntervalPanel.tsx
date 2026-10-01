@@ -112,7 +112,7 @@ export function IntervalPanel() {
 
           {/* Interval duration row (5 min increments up to 90 min) */}
           <div className="control-row">
-            <label htmlFor="interval-slider">Interval Timer</label>
+            <label htmlFor="interval-slider">Interval Timer (min)</label>
             <div className="slider-group">
               <input
                 id="interval-slider"
@@ -128,17 +128,17 @@ export function IntervalPanel() {
                 min={5}
                 max={90}
                 step={5}
-                formatDisplay={(min) => `${min} min`}
+                formatDisplay={(min) => `${min}`}
                 parseInput={parseMinutes}
                 onCommit={(min) => setIntervalMinutes(min)}
-                ariaLabel="Interval duration in minutes (5 to 90 min). Type value and press Enter."
+                ariaLabel="Interval duration in minutes (5 to 90 min). Type numerical value and press Enter."
               />
             </div>
           </div>
 
           {/* Interval Volume */}
           <div className="control-row">
-            <label htmlFor="interval-volume">Interval Volume</label>
+            <label htmlFor="interval-volume">Interval Volume (%)</label>
             <div className="slider-group">
               <input
                 id="interval-volume"
@@ -153,10 +153,10 @@ export function IntervalPanel() {
                 value={intervalVolume}
                 min={0}
                 max={1}
-                formatDisplay={(v) => `${Math.round(v * 100)}%`}
+                formatDisplay={(v) => `${Math.round(v * 100)}`}
                 parseInput={parsePercent}
                 onCommit={(v) => setIntervalVolume(v)}
-                ariaLabel="Interval volume percentage. Type value and press Enter."
+                ariaLabel="Interval volume percentage. Type numerical value and press Enter."
               />
             </div>
           </div>

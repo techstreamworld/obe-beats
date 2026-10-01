@@ -37,6 +37,7 @@ const DEFAULT_STATE = {
   exportFormat: 'wav' as ExportFormat,
   exportStatus: 'idle' as ExportStatus,
   activePresetId: null as string | null,
+  seekRequest: null as { elapsedSeconds: number; key: number } | null,
 };
 
 // ── Store shape ──
@@ -45,6 +46,8 @@ export interface AppState {
   // Transport
   playback: PlaybackState;
   restartKey: number;
+  seekRequest: { elapsedSeconds: number; key: number } | null;
+  seek: (elapsedSeconds: number) => void;
   play: () => void;
   pause: () => void;
   stop: () => void;
@@ -177,6 +180,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   pause: () => set({ playback: 'paused' }),
   stop: () => set({ playback: 'stopped' }),
   restart: () => set((state) => ({ playback: 'playing', restartKey: state.restartKey + 1 })),
+  seek: (elapsedSeconds: number) =>
+    set({
+      seekRequest: { elapsedSeconds, key: Date.now() + Math.random() },
+    }),
   resetAll: () => {
     AudioEngine.getInstance().resetDefaults();
     set({

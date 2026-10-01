@@ -176,6 +176,22 @@ export class AudioEngine {
     await this.play();
   }
 
+  /** Seek playback to a specific elapsed time point in seconds. */
+  seek(elapsedSeconds: number, sessionDuration: number): void {
+    this.sessionDuration = sessionDuration;
+    if (this.ambientPlayer && this._ambientEnabled) {
+      this.ambientPlayer.seek(elapsedSeconds, sessionDuration);
+    }
+    if (this.intervalPlayer) {
+      this.intervalPlayer.seek(elapsedSeconds);
+    }
+    // Cancel any scheduled fade ramps and ensure master volume is restored
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.masterGain.gain.setValueAtTime(this.masterVol, this.ctx.currentTime);
+    }
+  }
+
   /** Close the AudioContext entirely. Resets the singleton. */
   async dispose(): Promise<void> {
     this.stop();

@@ -66,39 +66,23 @@ export function FrequencyPanel() {
           />
           <span className="panel-checkbox-title binaural-checkbox-title">Binaural Beats</span>
         </label>
+        {binauralEnabled && (
+          <span
+            className="wave-badge"
+            title={`${currentBand.name} waves (${currentBand.range})`}
+            aria-label={`Current brainwave band: ${currentBand.name} waves, range ${currentBand.range}`}
+          >
+            {currentBand.name} Waves
+          </span>
+        )}
       </div>
 
       {/* Options revealed only when ticked */}
       {binauralEnabled && (
         <div className="binaural-options-container">
-          {/* Tone Volume (Default 50%) */}
-          <div className="control-row">
-            <label htmlFor="binaural-tone-vol">Tone Volume</label>
-            <div className="slider-group">
-              <input
-                id="binaural-tone-vol"
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={binauralVolume}
-                onChange={(e) => setBinauralVolume(Number(e.target.value))}
-              />
-              <CommitInput
-                value={binauralVolume}
-                min={0}
-                max={1}
-                formatDisplay={(v) => `${Math.round(v * 100)}%`}
-                parseInput={parsePercent}
-                onCommit={(v) => setBinauralVolume(v)}
-                ariaLabel="Binaural tone volume percentage. Type value and press Enter."
-              />
-            </div>
-          </div>
-
           {/* Beat frequency */}
           <div className="control-row">
-            <label htmlFor="beat-freq">Beat Frequency</label>
+            <label htmlFor="beat-freq">Beat Frequency (Hz)</label>
             <div className="slider-group">
               <input
                 id="beat-freq"
@@ -113,27 +97,20 @@ export function FrequencyPanel() {
                 value={beatFrequency}
                 min={0.5}
                 max={40.0}
-                formatDisplay={(v) => `${Number.isInteger(v * 10) ? v.toFixed(1) : v.toFixed(2)} Hz`}
+                formatDisplay={(v) => (Number.isInteger(v * 10) ? v.toFixed(1) : v.toFixed(2))}
                 parseInput={(str) => {
                   const num = parseFloat(str.replace(/[^0-9.]/g, ''));
                   return isNaN(num) ? null : Math.round(num * 100) / 100;
                 }}
                 onCommit={(v) => setBeatFrequency(v)}
-                ariaLabel="Beat frequency in Hertz. Type exact value and press Enter."
+                ariaLabel="Beat frequency in Hertz. Type exact numerical value and press Enter."
               />
-              <span
-                className="wave-badge"
-                title={`${currentBand.name} waves (${currentBand.range})`}
-                aria-label={`Current brainwave band: ${currentBand.name} waves, range ${currentBand.range}`}
-              >
-                {currentBand.name} Waves
-              </span>
             </div>
           </div>
 
           {/* Carrier frequency */}
           <div className="control-row">
-            <label htmlFor="carrier-freq">Carrier Frequency</label>
+            <label htmlFor="carrier-freq">Carrier Frequency (Hz)</label>
             <div className="slider-group">
               <input
                 id="carrier-freq"
@@ -148,13 +125,38 @@ export function FrequencyPanel() {
                 value={carrierFrequency}
                 min={20}
                 max={1500}
-                formatDisplay={(v) => `${Math.round(v)} Hz`}
+                formatDisplay={(v) => `${Math.round(v)}`}
                 parseInput={(str) => {
                   const num = parseFloat(str.replace(/[^0-9.]/g, ''));
                   return isNaN(num) ? null : Math.round(num);
                 }}
                 onCommit={(v) => setCarrierFrequency(v)}
-                ariaLabel="Carrier frequency in Hertz. Type exact value and press Enter."
+                ariaLabel="Carrier frequency in Hertz. Type exact numerical value and press Enter."
+              />
+            </div>
+          </div>
+
+          {/* Tone Volume (moved to bottom, default 50%) */}
+          <div className="control-row">
+            <label htmlFor="binaural-tone-vol">Tone Volume (%)</label>
+            <div className="slider-group">
+              <input
+                id="binaural-tone-vol"
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={binauralVolume}
+                onChange={(e) => setBinauralVolume(Number(e.target.value))}
+              />
+              <CommitInput
+                value={binauralVolume}
+                min={0}
+                max={1}
+                formatDisplay={(v) => `${Math.round(v * 100)}`}
+                parseInput={parsePercent}
+                onCommit={(v) => setBinauralVolume(v)}
+                ariaLabel="Binaural tone volume percentage. Type numerical value and press Enter."
               />
             </div>
           </div>
