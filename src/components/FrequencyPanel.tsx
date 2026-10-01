@@ -4,6 +4,7 @@ import './FrequencyPanel.css';
 
 interface BrainwaveBand {
   name: string;
+  id: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma';
   range: string;
 }
 
@@ -17,18 +18,18 @@ interface BrainwaveBand {
  */
 function getBrainwaveBand(hz: number): BrainwaveBand {
   if (hz > 30) {
-    return { name: 'Gamma', range: '30 < Hz <= 40' };
+    return { name: 'Gamma', id: 'gamma', range: '30 < Hz <= 40' };
   }
   if (hz > 13) {
-    return { name: 'Beta', range: '13 < Hz <= 30' };
+    return { name: 'Beta', id: 'beta', range: '13 < Hz <= 30' };
   }
   if (hz > 8) {
-    return { name: 'Alpha', range: '8 < Hz <= 13' };
+    return { name: 'Alpha', id: 'alpha', range: '8 < Hz <= 13' };
   }
   if (hz > 4) {
-    return { name: 'Theta', range: '4 < Hz <= 8' };
+    return { name: 'Theta', id: 'theta', range: '4 < Hz <= 8' };
   }
-  return { name: 'Delta', range: '1 <= Hz <= 4' };
+  return { name: 'Delta', id: 'delta', range: '1 <= Hz <= 4' };
 }
 
 export function FrequencyPanel() {
@@ -68,7 +69,7 @@ export function FrequencyPanel() {
         </label>
         {binauralEnabled && (
           <span
-            className="wave-badge"
+            className={`wave-badge wave-badge-${currentBand.id}`}
             title={`${currentBand.name} (${currentBand.range})`}
             aria-label={`Current brainwave band: ${currentBand.name}, range ${currentBand.range}`}
           >

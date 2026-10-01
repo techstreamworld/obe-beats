@@ -21,11 +21,7 @@ function App() {
     <div className="app-shell">
       <header className="app-header">
         <div className="header-brand">
-          <h1>
-            <span className="brand-binaural">Binaural</span>{' '}
-            <span className="brand-beats">Beats</span>{' '}
-            <span className="brand-generator">Generator</span>
-          </h1>
+          <h1>OBE Beats</h1>
           <p className="tagline">Create custom binaural beat sessions directly in your browser.</p>
         </div>
         <div className="header-transport">

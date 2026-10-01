@@ -25,23 +25,50 @@
   align-items: center;
   justify-content: center;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   color: #ffffff;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(139, 140, 245, 0.45) 100%);
-  border: 1.5px solid var(--outline-accent);
-  padding: 4px 14px;
+  padding: 6px 18px;
   border-radius: 9999px;
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(139, 140, 245, 0.45), 0 2px 6px rgba(0, 0, 0, 0.4);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: all 0.25s ease;
 }
 
-@media (max-width: 480px) {
-  .wave-suffix {
-    display: none;
-  }
+/* Delta — Deep Indigo #4C3A91 */
+.wave-badge-delta {
+  background: linear-gradient(135deg, rgba(76, 58, 145, 0.5) 0%, rgba(76, 58, 145, 0.85) 100%);
+  border-color: #4C3A91;
+  box-shadow: 0 0 16px rgba(76, 58, 145, 0.65), 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Theta — Violet #8067C7 */
+.wave-badge-theta {
+  background: linear-gradient(135deg, rgba(128, 103, 199, 0.5) 0%, rgba(128, 103, 199, 0.85) 100%);
+  border-color: #8067C7;
+  box-shadow: 0 0 16px rgba(128, 103, 199, 0.65), 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Alpha — Teal #36B8B0 */
+.wave-badge-alpha {
+  background: linear-gradient(135deg, rgba(54, 184, 176, 0.45) 0%, rgba(54, 184, 176, 0.8) 100%);
+  border-color: #36B8B0;
+  box-shadow: 0 0 16px rgba(54, 184, 176, 0.65), 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Beta — Blue #4F8FE8 */
+.wave-badge-beta {
+  background: linear-gradient(135deg, rgba(79, 143, 232, 0.45) 0%, rgba(79, 143, 232, 0.8) 100%);
+  border-color: #4F8FE8;
+  box-shadow: 0 0 16px rgba(79, 143, 232, 0.65), 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Gamma — Amber #E7A93B */
+.wave-badge-gamma {
+  background: linear-gradient(135deg, rgba(231, 169, 59, 0.45) 0%, rgba(231, 169, 59, 0.8) 100%);
+  border-color: #E7A93B;
+  box-shadow: 0 0 16px rgba(231, 169, 59, 0.65), 0 3px 8px rgba(0, 0, 0, 0.45);
 }
