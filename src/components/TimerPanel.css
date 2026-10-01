@@ -18,12 +18,12 @@
   font-family: var(--mono);
   font-size: 24px;
   font-weight: 700;
-  color: var(--accent);
+  color: #93c5fd;
   letter-spacing: 1px;
-  padding: 2px 8px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 3px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
 }
 
 .session-duration-row {

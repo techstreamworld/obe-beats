@@ -23,8 +23,12 @@ function App() {
 
       <header className="app-header">
         <div className="header-brand">
-          <h1>OBE Beats</h1>
-          <p className="tagline">Binaural beats &amp; ambient sound generator</p>
+          <h1>
+            <span className="brand-binaural">Binaural</span>{' '}
+            <span className="brand-beats">Beats</span>{' '}
+            <span className="brand-generator">Generator</span>
+          </h1>
+          <p className="tagline">Create custom binaural beat sessions directly in your browser.</p>
         </div>
         <div className="header-transport">
           <TransportBar />
@@ -70,7 +74,7 @@ function App() {
       </div>
 
       <footer className="app-footer">
-        <small>OBE Beats — use headphones for binaural brainwave entrainment</small>
+        <small>Free, private, and ad-free. OBE Beats — use headphones for binaural brainwave entrainment.</small>
       </footer>
     </div>
   );

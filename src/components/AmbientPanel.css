@@ -70,15 +70,15 @@
   width: 100%;
   min-height: 38px;
   padding: 6px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: var(--bg);
+  background: var(--bg-input);
   color: var(--text-h);
   font-family: var(--sans);
   font-size: 14px;
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
@@ -99,23 +99,24 @@
   justify-content: center;
   gap: 6px;
   width: 100%;
-  min-height: 34px;
-  padding: 6px 12px;
-  font-size: 12px;
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 12.5px;
   font-weight: 500;
   font-family: var(--sans);
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 1px dashed var(--accent-border);
-  border-radius: 8px;
+  color: #93c5fd;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 9999px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .add-layer-btn:hover {
-  background: rgba(168, 85, 247, 0.18);
+  background: rgba(37, 99, 235, 0.2);
   border-color: var(--accent);
   border-style: solid;
+  color: #ffffff;
 }
 
 .add-layer-btn:focus-visible {
@@ -125,16 +126,16 @@
 
 @media (prefers-color-scheme: light) {
   .ambient-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236b6375' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 
   .add-layer-btn {
-    background: rgba(147, 51, 234, 0.08);
-    border-color: rgba(147, 51, 234, 0.35);
+    background: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.35);
   }
 
   .add-layer-btn:hover {
-    background: rgba(147, 51, 234, 0.14);
+    background: rgba(37, 99, 235, 0.15);
     border-color: var(--accent);
   }
 }

@@ -20,7 +20,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: var(--accent);
+  color: var(--brand-blue);
 }
 
 .preset-vertical-list {
@@ -38,10 +38,10 @@
   text-align: left;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  transition: all 0.15s ease;
   width: 100%;
   box-sizing: border-box;
   font-family: var(--sans);
@@ -51,7 +51,7 @@
 }
 
 .preset-card:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-light);
   background: var(--accent-bg);
   transform: translateY(-1px);
 }
@@ -64,7 +64,7 @@
 .preset-card.is-active {
   border: 1.5px solid var(--accent);
   background: var(--accent-bg);
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.25);
 }
 
 .preset-card-top {
@@ -89,13 +89,13 @@
   letter-spacing: 0.5px;
   background: var(--accent);
   color: #ffffff;
-  border-radius: 3px;
-  padding: 1px 5px;
+  border-radius: 9999px;
+  padding: 2px 7px;
   line-height: 1.3;
 }
 
 .preset-tagline {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text);
   margin-bottom: 6px;
   line-height: 1.3;
@@ -108,14 +108,14 @@
 }
 
 .preset-badge {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 500;
   font-family: var(--sans);
-  color: var(--text-h);
-  background: var(--bg);
+  color: var(--text-muted);
+  background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 3px 6px;
+  border-radius: 6px;
+  padding: 3px 8px;
   width: 100%;
   box-sizing: border-box;
   line-height: 1.3;
@@ -124,7 +124,7 @@
 
 .preset-card.is-active .preset-badge {
   border-color: var(--accent-border);
-  color: var(--accent);
-  background: rgba(168, 85, 247, 0.08);
+  color: #93c5fd;
+  background: rgba(37, 99, 235, 0.12);
   font-weight: 600;
 }

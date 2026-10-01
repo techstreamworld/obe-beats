@@ -13,14 +13,14 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 38px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  min-height: 40px;
+  padding: 8px 18px;
+  border-radius: 9999px;
   font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+  transition: all 0.15s ease;
   user-select: none;
 }
 
@@ -33,51 +33,55 @@
   outline-offset: 2px;
 }
 
-/* Play / Pause button */
+/* Play / Pause button — solid royal blue pill */
 .btn-play-pause {
-  min-width: 95px;
-  border: 2px solid var(--accent);
-  background: var(--accent-bg);
-  color: var(--accent);
+  min-width: 100px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .btn-play-pause:hover {
-  background: var(--accent-border);
-  box-shadow: var(--shadow);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
 }
 
 .btn-play-pause.is-playing {
-  background: var(--accent);
-  color: var(--bg);
+  background: #1e40af;
+  border-color: var(--accent-light);
+  color: #ffffff;
 }
 
 .btn-play-pause.is-playing:hover {
-  opacity: 0.92;
-  box-shadow: var(--shadow);
+  background: #1d4ed8;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
 }
 
-/* Secondary Action Buttons (Restart & Reset) */
+/* Secondary Action Buttons (Restart & Reset) — dark navy pill */
 .btn-secondary {
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--border-light);
+  background: var(--bg-input);
   color: var(--text-h);
 }
 
 .btn-secondary:hover {
-  background: var(--bg-surface);
-  border-color: var(--text);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  background: var(--bg-elevated);
+  border-color: var(--accent-light);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn-restart:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-light);
+  color: #ffffff;
 }
 
 .btn-reset:hover {
   border-color: rgba(239, 68, 68, 0.6);
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .transport-icon {

@@ -3,7 +3,7 @@
 .version-bar-container {
   width: 100%;
   padding: 8px 16px;
-  background: var(--bg-surface);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: center;
@@ -13,14 +13,14 @@
 .version-field {
   width: 100%;
   max-width: 680px;
-  min-height: 38px;
-  padding: 6px 14px;
-  background: var(--bg);
-  border: 1px solid var(--accent-border);
-  border-radius: 8px;
-  color: var(--text-h);
+  min-height: 34px;
+  padding: 4px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: 9999px;
+  color: var(--text-muted);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
   outline: none;
   cursor: default;
