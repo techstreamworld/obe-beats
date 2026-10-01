@@ -83,7 +83,7 @@ export function FrequencyPanel() {
         <div className="binaural-options-container">
           {/* Beat frequency */}
           <div className="control-row">
-            <label htmlFor="beat-freq">Beat Frequency (Hz)</label>
+            <label htmlFor="beat-freq">Tone (Hz)</label>
             <div className="slider-group">
               <input
                 id="beat-freq"
@@ -104,14 +104,14 @@ export function FrequencyPanel() {
                   return isNaN(num) ? null : Math.round(num * 100) / 100;
                 }}
                 onCommit={(v) => setBeatFrequency(v)}
-                ariaLabel="Beat frequency in Hertz. Type exact numerical value and press Enter."
+                ariaLabel="Tone frequency in Hertz. Type exact numerical value and press Enter."
               />
             </div>
           </div>
 
           {/* Carrier frequency */}
           <div className="control-row">
-            <label htmlFor="carrier-freq">Carrier Frequency (Hz)</label>
+            <label htmlFor="carrier-freq">Carrier (Hz)</label>
             <div className="slider-group">
               <input
                 id="carrier-freq"
@@ -137,9 +137,9 @@ export function FrequencyPanel() {
             </div>
           </div>
 
-          {/* Tone Volume (moved to bottom, default 50%) */}
+          {/* Volume */}
           <div className="control-row">
-            <label htmlFor="binaural-tone-vol">Tone Volume (%)</label>
+            <label htmlFor="binaural-tone-vol">Volume (%)</label>
             <div className="slider-group">
               <input
                 id="binaural-tone-vol"

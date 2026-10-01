@@ -18,7 +18,7 @@ export function VolumePanel() {
     <div className="volume-panel">
       {/* Master Volume */}
       <div className="control-row">
-        <label htmlFor="vol-master">Master Volume (%)</label>
+        <label htmlFor="vol-master">Main Volume (%)</label>
         <div className="slider-group">
           <input
             id="vol-master"
@@ -36,7 +36,7 @@ export function VolumePanel() {
             formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setMasterVolume(v)}
-            ariaLabel="Master volume percentage. Type numerical value and press Enter."
+            ariaLabel="Main volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>
@@ -44,7 +44,7 @@ export function VolumePanel() {
       {/* Ear Balance Slider */}
       <div className="control-row ear-balance-row">
         <div className="ear-balance-label-row">
-          <label htmlFor="vol-ear-balance">Ear Balance (%)</label>
+          <label htmlFor="vol-ear-balance">Balance (%)</label>
           <span className="ear-balance-center-label">
             {earBalance === 50
               ? 'Center'

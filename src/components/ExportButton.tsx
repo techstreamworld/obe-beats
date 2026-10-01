@@ -137,7 +137,7 @@ export function ExportButton() {
     <div className="export-panel">
       {/* Format setting dropdown with size estimation */}
       <div className="control-row">
-        <label htmlFor="export-format-select">Export Format &amp; File Size</label>
+        <label htmlFor="export-format-select">Format</label>
         <select
           id="export-format-select"
           className="export-select"

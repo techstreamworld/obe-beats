@@ -58,7 +58,7 @@ export function AmbientPanel() {
         <div className="ambient-options-container">
           {ambientLayers.map((layer, index) => {
             const isSelected = Boolean(layer.soundId);
-            const layerTitle = ambientLayers.length > 1 ? `Ambient Sound ${index + 1}` : 'Sound Effect';
+            const layerTitle = ambientLayers.length > 1 ? `Sound ${index + 1}` : 'Sound';
 
             return (
               <div key={layer.id} className="ambient-layer-row">

@@ -1,4 +1,4 @@
 {
-  "version": 225,
-  "lastUpdate": "Move playback bar next to play button with inline timestamps, update Delta to Midnight Blue and Theta to Magenta Purple"
+  "version": 239,
+  "lastUpdate": "Move seek bar to left of play button, inline sub-headers with sliders/dropdowns, update labels & compact preview"
 }

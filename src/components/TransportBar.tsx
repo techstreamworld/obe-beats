@@ -65,29 +65,7 @@ export function TransportBar() {
 
   return (
     <div className="transport-bar" role="toolbar" aria-label="Audio playback controls">
-      {/* Play / Pause button */}
-      <button
-        type="button"
-        className={`transport-btn btn-play-pause ${isPlaying ? 'is-playing' : ''}`}
-        onClick={isPlaying ? pause : play}
-        aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-        title={isPlaying ? 'Pause audio' : 'Play audio'}
-      >
-        <span className="transport-icon" aria-hidden="true">
-          {isPlaying ? (
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
-        </span>
-        <span className="transport-btn-label">{isPlaying ? 'Pause' : 'Play'}</span>
-      </button>
-
-      {/* Playback Seek Bar next to Play button (on the same horizontal line with timestamps) */}
+      {/* Playback Seek Bar to the left of Play/Pause button */}
       {playback !== 'stopped' && timerDuration > 0 && (
         <div className="transport-playback-bar" aria-label="Playback progress and seeking">
           <div className="playback-slider-container">
@@ -128,6 +106,28 @@ export function TransportBar() {
           </span>
         </div>
       )}
+
+      {/* Play / Pause button */}
+      <button
+        type="button"
+        className={`transport-btn btn-play-pause ${isPlaying ? 'is-playing' : ''}`}
+        onClick={isPlaying ? pause : play}
+        aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+        title={isPlaying ? 'Pause audio' : 'Play audio'}
+      >
+        <span className="transport-icon" aria-hidden="true">
+          {isPlaying ? (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </span>
+        <span className="transport-btn-label">{isPlaying ? 'Pause' : 'Play'}</span>
+      </button>
 
       {/* Restart button */}
       <button

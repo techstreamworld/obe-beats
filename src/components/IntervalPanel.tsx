@@ -14,7 +14,7 @@ const TONE_OPTIONS: { id: IntervalTone; label: string }[] = [
 const REPEAT_OPTIONS = [
   { value: 1, label: '1×' },
   { value: 2, label: '2×' },
-  { value: 3, label: '3× (Default)' },
+  { value: 3, label: '3×' },
   { value: 4, label: '4×' },
   { value: 5, label: '5×' },
 ];
@@ -59,7 +59,7 @@ export function IntervalPanel() {
 
   return (
     <div className="interval-panel">
-      {/* Tick box header: when ticked it opens options, when unticked it hides them */}
+      {/* Tick box header: when ticked it opens options, with compact preview button on the right */}
       <div className="interval-toggle-row">
         <label className="interval-checkbox-label" htmlFor="interval-enabled-checkbox">
           <input
@@ -71,14 +71,25 @@ export function IntervalPanel() {
           />
           <span className="interval-checkbox-title">Interval Sound</span>
         </label>
+        {intervalEnabled && (
+          <button
+            type="button"
+            className={`interval-preview-btn-compact ${isIntervalPreviewing ? 'is-active' : ''}`}
+            onClick={handleTogglePreview}
+            title={isIntervalPreviewing ? 'Stop preview' : `Preview interval sound (${intervalRepeatCount}×)`}
+            aria-label={isIntervalPreviewing ? 'Stop preview' : 'Preview interval sound'}
+          >
+            {isIntervalPreviewing ? 'Stop' : 'Preview'}
+          </button>
+        )}
       </div>
 
       {/* Interval options (revealed only when ticked) */}
       {intervalEnabled && (
         <div className="interval-options-container">
-          {/* Sound selection dropdown (like Ambient Sound) */}
+          {/* Sound selection dropdown */}
           <div className="control-row">
-            <label htmlFor="interval-sound-select">Sound Effect</label>
+            <label htmlFor="interval-sound-select">Sound</label>
             <select
               id="interval-sound-select"
               className="interval-select"
@@ -112,7 +123,7 @@ export function IntervalPanel() {
 
           {/* Interval duration row (5 min increments up to 90 min) */}
           <div className="control-row">
-            <label htmlFor="interval-slider">Interval Timer (min)</label>
+            <label htmlFor="interval-slider">Timer (min)</label>
             <div className="slider-group">
               <input
                 id="interval-slider"
@@ -138,7 +149,7 @@ export function IntervalPanel() {
 
           {/* Interval Volume */}
           <div className="control-row">
-            <label htmlFor="interval-volume">Interval Volume (%)</label>
+            <label htmlFor="interval-volume">Volume (%)</label>
             <div className="slider-group">
               <input
                 id="interval-volume"
@@ -159,18 +170,6 @@ export function IntervalPanel() {
                 ariaLabel="Interval volume percentage. Type numerical value and press Enter."
               />
             </div>
-          </div>
-
-          {/* Preview trigger button */}
-          <div className="interval-footer">
-            <button
-              type="button"
-              className={`interval-preview-btn ${isIntervalPreviewing ? 'active' : ''}`}
-              onClick={handleTogglePreview}
-              title="Preview interval tone sequence"
-            >
-              {isIntervalPreviewing ? '⏹ Stop Preview' : `▶ Preview Interval (${intervalRepeatCount}×)`}
-            </button>
           </div>
         </div>
       )}

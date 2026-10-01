@@ -91,8 +91,12 @@ p {
 
 .control-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 40px;
+  width: 100%;
 }
 
 .control-row label {
@@ -102,13 +106,34 @@ p {
   color: var(--text);
 }
 
-.slider-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 38px;
-  width: 100%;
+.control-row > label,
+.control-row > .ambient-layer-header,
+.control-row > .ear-balance-label-row {
+  min-width: 110px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.control-row .slider-group {
+  flex: 1;
   min-width: 0;
+}
+
+.control-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .control-row {
+    gap: 8px;
+  }
+  .control-row > label,
+  .control-row > .ambient-layer-header,
+  .control-row > .ear-balance-label-row {
+    min-width: 90px;
+    font-size: 12px;
+  }
 }
 
 .slider-group input[type='range'] {

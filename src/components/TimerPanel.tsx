@@ -26,7 +26,7 @@ export function TimerPanel() {
 
       {/* Session Duration row (Max 3 hours / 180 min) */}
       <div className="control-row session-duration-row">
-        <label htmlFor="timer-duration">Session Duration (min)</label>
+        <label htmlFor="timer-duration">Duration (min)</label>
         <div className="slider-group">
           <input
             id="timer-duration"
@@ -52,9 +52,9 @@ export function TimerPanel() {
         </div>
       </div>
 
-      {/* Master Volume */}
+      {/* Main Volume */}
       <div className="control-row master-volume-row">
-        <label htmlFor="vol-master">Master Volume (%)</label>
+        <label htmlFor="vol-master">Main Volume (%)</label>
         <div className="slider-group">
           <input
             id="vol-master"
@@ -72,7 +72,7 @@ export function TimerPanel() {
             formatDisplay={(v) => `${Math.round(v * 100)}`}
             parseInput={parsePercent}
             onCommit={(v) => setMasterVolume(v)}
-            ariaLabel="Master volume percentage. Type numerical value and press Enter."
+            ariaLabel="Main volume percentage. Type numerical value and press Enter."
           />
         </div>
       </div>
@@ -80,7 +80,7 @@ export function TimerPanel() {
       {/* Ear Balance Slider (Combined Left/Right, centered at 50% by default) */}
       <div className="control-row ear-balance-row">
         <div className="ear-balance-label-row">
-          <label htmlFor="ear-balance">Ear Balance (%)</label>
+          <label htmlFor="ear-balance">Balance (%)</label>
           <span
             className="ear-balance-center-label"
             title="0 = Left, 50 = Center, 100 = Right. Double click slider to reset."

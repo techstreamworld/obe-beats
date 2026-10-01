@@ -15,9 +15,11 @@
 }
 
 .ear-balance-label-row {
-  display: flex;
-  justify-content: space-between;
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  min-width: 125px;
+  flex-shrink: 0;
 }
 
 .ear-balance-center-label {
