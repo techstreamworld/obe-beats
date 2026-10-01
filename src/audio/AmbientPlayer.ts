@@ -401,6 +401,7 @@ export class AmbientPlayer {
       'ocean-waves': '/sound/Ocean Waves.wav',
       river: '/sound/River.wav',
       fireplace: '/sound/Fireplace.wav',
+      'deep-sea': '/sound/Deep sea.wav',
     };
     return paths[id] ?? null;
   }

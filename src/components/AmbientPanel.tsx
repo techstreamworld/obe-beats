@@ -10,6 +10,7 @@ const AMBIENT_CATALOGUE: AmbientSoundEntry[] = [
   { id: 'ocean-waves', label: 'Ocean Waves', group: 'nature' },
   { id: 'river',       label: 'River',       group: 'nature' },
   { id: 'fireplace',   label: 'Fireplace',   group: 'nature' },
+  { id: 'deep-sea',    label: 'Deep Sea',    group: 'nature' },
   // Noise (generated in code)
   { id: 'white-noise', label: 'White',       group: 'noise' },
   { id: 'pink-noise',  label: 'Pink',        group: 'noise' },

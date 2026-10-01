@@ -324,6 +324,7 @@ export class WavExporter {
           'ocean-waves': '/sound/Ocean Waves.wav',
           river: '/sound/River.wav',
           fireplace: '/sound/Fireplace.wav',
+          'deep-sea': '/sound/Deep sea.wav',
         };
         const src = pathMap[id];
         if (!src) return null;
