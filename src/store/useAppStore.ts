@@ -140,7 +140,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     // The meditation preset will now choose a different random ambient nature sound each time it's clicked
     let ambientLayers = preset.ambientLayers;
     if (preset.id === 'meditation') {
-      const NATURE_SOUNDS = ['rain', 'forest-rain', 'ocean-waves'];
+      const NATURE_SOUNDS = ['rain', 'ocean-waves', 'river', 'fireplace'];
       const currentSound = get().ambientLayers[0]?.soundId;
       const candidates = NATURE_SOUNDS.filter((s) => s !== currentSound);
       const chosen = candidates[Math.floor(Math.random() * candidates.length)] || NATURE_SOUNDS[0];

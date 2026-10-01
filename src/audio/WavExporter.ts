@@ -160,12 +160,56 @@ export class WavExporter {
 
         const ambientBuffer = await this.getAmbientBuffer(offlineCtx, layer.soundId);
         if (ambientBuffer) {
-          const ambientSource = offlineCtx.createBufferSource();
-          ambientSource.buffer = ambientBuffer;
-          ambientSource.loop = true;
-          ambientSource.connect(ambientGain);
-          ambientSource.start(0);
-          ambientSource.stop(duration);
+          const isNoise = ['white-noise', 'pink-noise', 'brown-noise', 'black-noise'].includes(layer.soundId);
+          if (isNoise) {
+            const ambientSource = offlineCtx.createBufferSource();
+            ambientSource.buffer = ambientBuffer;
+            ambientSource.loop = true;
+            ambientSource.connect(ambientGain);
+            ambientSource.start(0);
+            ambientSource.stop(duration);
+          } else {
+            // Reloops audio files with 10-second crossfades and cuts off at session duration
+            const D = ambientBuffer.duration;
+            const X = Math.min(10.0, D / 2);
+            const stepTime = D - X;
+
+            let tStart = 0;
+            let loopIndex = 0;
+
+            while (tStart < duration) {
+              const tEnd = Math.min(duration, tStart + D);
+              if (tEnd <= tStart) break;
+
+              const strikeGain = offlineCtx.createGain();
+
+              // Incoming crossfade (starts at full gain on first loop)
+              if (loopIndex > 0) {
+                strikeGain.gain.setValueAtTime(0, tStart);
+                strikeGain.gain.linearRampToValueAtTime(1.0, Math.min(duration, tStart + X));
+              } else {
+                strikeGain.gain.setValueAtTime(1.0, tStart);
+              }
+
+              // Outgoing crossfade at end of buffer
+              const tFadeOutStart = tStart + D - X;
+              if (tFadeOutStart < duration) {
+                strikeGain.gain.setValueAtTime(1.0, tFadeOutStart);
+                strikeGain.gain.linearRampToValueAtTime(0, Math.min(duration, tStart + D));
+              }
+
+              strikeGain.connect(ambientGain);
+
+              const source = offlineCtx.createBufferSource();
+              source.buffer = ambientBuffer;
+              source.connect(strikeGain);
+              source.start(tStart);
+              source.stop(tEnd); // Correctly cuts off in the middle if it goes over session duration!
+
+              tStart += stepTime;
+              loopIndex++;
+            }
+          }
         }
       }
     }
@@ -259,6 +303,8 @@ export class WavExporter {
 
   // ── Internal Helpers ──
 
+  private static arrayBufferCache = new Map<string, ArrayBuffer>();
+
   private static async getAmbientBuffer(
     ctx: OfflineAudioContext,
     id: string,
@@ -274,17 +320,22 @@ export class WavExporter {
         return NoiseGenerator.black(ctx, 12);
       default: {
         const pathMap: Record<string, string> = {
-          rain: '/ambient/rain.mp3',
-          'forest-rain': '/ambient/forest-rain.mp3',
-          'ocean-waves': '/ambient/ocean-waves.mp3',
+          rain: '/sound/Rain.wav',
+          'ocean-waves': '/sound/Ocean Waves.wav',
+          river: '/sound/River.wav',
+          fireplace: '/sound/Fireplace.wav',
         };
         const src = pathMap[id];
         if (!src) return null;
         try {
-          const res = await fetch(src);
-          if (!res.ok) return null;
-          const ab = await res.arrayBuffer();
-          return await ctx.decodeAudioData(ab);
+          let ab = this.arrayBufferCache.get(src);
+          if (!ab) {
+            const res = await fetch(encodeURI(src));
+            if (!res.ok) return null;
+            ab = await res.arrayBuffer();
+            this.arrayBufferCache.set(src, ab);
+          }
+          return await ctx.decodeAudioData(ab.slice(0));
         } catch {
           return null;
         }

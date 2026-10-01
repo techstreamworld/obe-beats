@@ -5,10 +5,11 @@ import './AmbientPanel.css';
 
 /** Catalogue matching the user's dropdown design. */
 const AMBIENT_CATALOGUE: AmbientSoundEntry[] = [
-  // Nature Sounds (file-based — placeholder until audio files are provided)
+  // Nature Sounds (audio files in /sound/)
   { id: 'rain',        label: 'Rain',        group: 'nature' },
-  { id: 'forest-rain', label: 'Forest Rain', group: 'nature' },
   { id: 'ocean-waves', label: 'Ocean Waves', group: 'nature' },
+  { id: 'river',       label: 'River',       group: 'nature' },
+  { id: 'fireplace',   label: 'Fireplace',   group: 'nature' },
   // Noise (generated in code)
   { id: 'white-noise', label: 'White',       group: 'noise' },
   { id: 'pink-noise',  label: 'Pink',        group: 'noise' },

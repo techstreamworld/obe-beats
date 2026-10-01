@@ -41,6 +41,8 @@ export class AudioEngine {
   private intervalRepeatCount = 3;
   private previewChangeCallback?: (previewing: boolean) => void;
 
+  private sessionDuration = 0;
+
   private _playing = false;
   private _paused = false;
   private playSessionId = 0;
@@ -76,6 +78,7 @@ export class AudioEngine {
       this.masterGain.connect(this.ctx.destination);
 
       this.ambientPlayer = new AmbientPlayer(this.ctx, this.masterGain);
+      this.ambientPlayer.setSessionDuration(this.sessionDuration);
       if (this._ambientEnabled) {
         await this.ambientPlayer.syncLayers(this._ambientLayers);
       }
@@ -125,7 +128,7 @@ export class AudioEngine {
 
     // Start ambient & interval playback
     if (this.ambientPlayer && this._ambientEnabled) {
-      await this.ambientPlayer.play();
+      await this.ambientPlayer.play(this.sessionDuration);
       if (currentSession !== this.playSessionId) {
         this.binauralNode?.dispose();
         this.binauralNode = null;
@@ -280,6 +283,11 @@ export class AudioEngine {
     this.setAmbientLayers(updated);
   }
 
+  setSessionDuration(seconds: number): void {
+    this.sessionDuration = seconds;
+    this.ambientPlayer?.setSessionDuration(seconds);
+  }
+
   // ── Interval Audio Layer ──
 
   setIntervalConfig(tone: IntervalTone, intervalMinutes: number, volume: number, repeatCount = 3): void {
@@ -341,6 +349,7 @@ export class AudioEngine {
     this._binauralEnabled = true;
     this._ambientEnabled = false;
     this._ambientLayers = [{ id: 'layer-1', soundId: null, volume: 0.5 }];
+    this.sessionDuration = 0;
     this.intervalRepeatCount = 3;
     this.intervalPlayer?.setConfig('bell', 0, 0.5, 3);
     if (this.masterGain && this.ctx) {

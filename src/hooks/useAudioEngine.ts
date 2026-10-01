@@ -24,6 +24,7 @@ export function useAudioEngine(): void {
   const intervalVolume = useAppStore((s) => s.intervalVolume);
   const intervalRepeatCount = useAppStore((s) => s.intervalRepeatCount);
   const setIsIntervalPreviewing = useAppStore((s) => s.setIsIntervalPreviewing);
+  const timerDurationSeconds = useAppStore((s) => s.timerDurationSeconds);
 
   // ── Sync playback state ──
   useEffect(() => {
@@ -75,6 +76,11 @@ export function useAudioEngine(): void {
   useEffect(() => {
     AudioEngine.getInstance().setAmbientLayers(ambientLayers);
   }, [ambientLayers]);
+
+  // ── Sync session duration ──
+  useEffect(() => {
+    AudioEngine.getInstance().setSessionDuration(timerDurationSeconds);
+  }, [timerDurationSeconds]);
 
   // ── Sync interval layer ──
   useEffect(() => {

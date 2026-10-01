@@ -1,4 +1,4 @@
 {
-  "version": 153,
-  "lastUpdate": "Interval repeats 1-5x with progressive volume, lowered interval default sound, WBTB 25m, randomized meditation nature sound"
+  "version": 163,
+  "lastUpdate": "10s crossfade ambient relooping, audio files in public/sound, added River and Fireplace, session cutoff"
 }
