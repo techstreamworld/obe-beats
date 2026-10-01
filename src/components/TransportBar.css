@@ -95,3 +95,127 @@
 .transport-icon svg {
   display: block;
 }
+
+/* ── Transport Playback Seek Bar (Next to Play button, inline with timestamp) ── */
+.transport-playback-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: 9999px;
+  padding: 4px 14px 4px 14px;
+  min-height: 40px;
+  min-width: 220px;
+  max-width: 380px;
+  flex: 1;
+  box-sizing: border-box;
+  animation: fadeIn 0.15s ease;
+}
+
+.playback-slider-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 80px;
+}
+
+.playback-slider {
+  width: 100%;
+  height: 6px;
+  padding: 10px 0;
+  appearance: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+.playback-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--slider-track);
+  border-radius: 9999px;
+}
+
+.playback-slider::-moz-range-track {
+  height: 6px;
+  background: var(--slider-track);
+  border-radius: 9999px;
+}
+
+.playback-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--outline-accent);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.playback-slider:hover::-webkit-slider-thumb {
+  background: #a787df;
+}
+
+.playback-slider:active::-webkit-slider-thumb {
+  transform: scale(1.18);
+  background: var(--accent);
+}
+
+.playback-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--outline-accent);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.playback-slider:hover::-moz-range-thumb {
+  background: #a787df;
+}
+
+.playback-slider:active::-moz-range-thumb {
+  transform: scale(1.18);
+  background: var(--accent);
+}
+
+/* ── Interval indicator notches on the seek bar ── */
+.interval-indicators-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.interval-bar-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--secondary-purple);
+  box-shadow: 0 0 6px rgba(139, 140, 245, 0.7);
+  pointer-events: none;
+}
+
+.playback-time-inline {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--outline-accent);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

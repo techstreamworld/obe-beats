@@ -1,6 +1,18 @@
+import { useState } from 'react';
 import { AudioEngine } from '../audio/AudioEngine.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './TransportBar.css';
+
+/** Format seconds as mm:ss or h:mm:ss. */
+function formatTime(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  if (h > 0) {
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
 
 export function TransportBar() {
   const playback = useAppStore((s) => s.playback);
@@ -8,8 +20,42 @@ export function TransportBar() {
   const pause = useAppStore((s) => s.pause);
   const restart = useAppStore((s) => s.restart);
   const resetAll = useAppStore((s) => s.resetAll);
+  const seek = useAppStore((s) => s.seek);
+
+  const timerDuration = useAppStore((s) => s.timerDurationSeconds);
+  const timerState = useAppStore((s) => s.timerState);
+  const intervalEnabled = useAppStore((s) => s.intervalEnabled);
+  const intervalMinutes = useAppStore((s) => s.intervalMinutes);
+
+  // Local scrub state for the playback seek bar
+  const [scrubValue, setScrubValue] = useState<number | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
 
   const isPlaying = playback === 'playing';
+
+  // Compute current elapsed playback seconds
+  const elapsedSeconds =
+    timerDuration > 0
+      ? Math.max(0, timerDuration - timerState.remainingSeconds)
+      : 0;
+
+  const displayElapsed =
+    isScrubbing && scrubValue !== null ? scrubValue : elapsedSeconds;
+
+  // Compute interval marker timestamps in seconds
+  const intervalMarkers: number[] = [];
+  if (intervalEnabled && intervalMinutes > 0 && timerDuration > 0) {
+    const step = intervalMinutes * 60;
+    for (let t = step; t < timerDuration; t += step) {
+      intervalMarkers.push(t);
+    }
+  }
+
+  const handleSeekCommit = (val: number) => {
+    seek(val);
+    setIsScrubbing(false);
+    setScrubValue(null);
+  };
 
   const handleReset = () => {
     // Unconditionally and synchronously stop all live audio and reset internal state
@@ -40,6 +86,48 @@ export function TransportBar() {
         </span>
         <span className="transport-btn-label">{isPlaying ? 'Pause' : 'Play'}</span>
       </button>
+
+      {/* Playback Seek Bar next to Play button (on the same horizontal line with timestamps) */}
+      {playback !== 'stopped' && timerDuration > 0 && (
+        <div className="transport-playback-bar" aria-label="Playback progress and seeking">
+          <div className="playback-slider-container">
+            <input
+              type="range"
+              className="playback-slider"
+              min={0}
+              max={timerDuration}
+              step={1}
+              value={displayElapsed}
+              onPointerDown={() => setIsScrubbing(true)}
+              onChange={(e) => setScrubValue(Number(e.target.value))}
+              onPointerUp={(e) =>
+                handleSeekCommit(Number((e.target as HTMLInputElement).value))
+              }
+              onKeyUp={(e) =>
+                handleSeekCommit(Number((e.target as HTMLInputElement).value))
+              }
+              aria-label="Seek session playback. Drag to jump to any time point."
+            />
+            {intervalEnabled && intervalMinutes > 0 && (
+              <div className="interval-indicators-layer" aria-hidden="true">
+                {intervalMarkers.map((sec) => (
+                  <div
+                    key={sec}
+                    className="interval-bar-indicator"
+                    style={{
+                      left: `calc(9px + (100% - 18px) * ${sec / timerDuration})`,
+                    }}
+                    title={`Interval cue at ${formatTime(sec)}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="playback-time-inline" aria-live="polite">
+            {formatTime(displayElapsed)} / {formatTime(timerDuration)}
+          </span>
+        </div>
+      )}
 
       {/* Restart button */}
       <button
