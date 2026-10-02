@@ -6,6 +6,8 @@
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 1050px;
 }
 
 .transport-btn {
@@ -104,13 +106,21 @@
   background: var(--bg-input);
   border: 1px solid var(--border-light);
   border-radius: 9999px;
-  padding: 4px 14px 4px 14px;
+  padding: 4px 16px;
   min-height: 40px;
-  min-width: 220px;
-  max-width: 380px;
+  min-width: 260px;
+  max-width: 650px;
   flex: 1;
   box-sizing: border-box;
   animation: fadeIn 0.15s ease;
+}
+
+@media (max-width: 680px) {
+  .transport-playback-bar {
+    min-width: 180px;
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 .playback-slider-container {

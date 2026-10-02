@@ -1,4 +1,4 @@
 {
-  "version": 239,
-  "lastUpdate": "Move seek bar to left of play button, inline sub-headers with sliders/dropdowns, update labels & compact preview"
+  "version": 240,
+  "lastUpdate": "Increase playback bar length, inline Format dropdown with 'Export' only button"
 }

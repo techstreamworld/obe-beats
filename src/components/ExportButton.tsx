@@ -131,47 +131,47 @@ export function ExportButton() {
   const mp3_192Size = WavExporter.getEstimatedFileSize(exportDuration, 'mp3-192');
   const durationMins = Math.round(exportDuration / 60);
 
-  const buttonLabel = exportFormat === 'wav' ? 'Export WAV' : 'Export MP3';
-
   return (
     <div className="export-panel">
-      {/* Format setting dropdown with size estimation */}
-      <div className="control-row">
+      {/* Format setting dropdown & Export button on the same line */}
+      <div className="control-row export-row">
         <label htmlFor="export-format-select">Format</label>
-        <select
-          id="export-format-select"
-          className="export-select"
-          value={exportFormat}
-          onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
-          disabled={isExporting}
-        >
-          <option value="wav">WAV 44.1 kHz, 16-bit (Best) — {wavSize}</option>
-          <option value="mp3-320">MP3 320 kbps (High) — {mp3_320Size}</option>
-          <option value="mp3-192">MP3 192 kbps (Good) — {mp3_192Size}</option>
-        </select>
+        <div className="export-controls-group">
+          <select
+            id="export-format-select"
+            className="export-select"
+            value={exportFormat}
+            onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+            disabled={isExporting}
+          >
+            <option value="wav">WAV 44.1 kHz, 16-bit (Best) — {wavSize}</option>
+            <option value="mp3-320">MP3 320 kbps (High) — {mp3_320Size}</option>
+            <option value="mp3-192">MP3 192 kbps (Good) — {mp3_192Size}</option>
+          </select>
+
+          <button
+            type="button"
+            className={`export-btn ${isExporting ? 'is-loading' : ''}`}
+            onClick={handleExportClick}
+            disabled={isExporting}
+            aria-label={`Export file (${exportFormat})`}
+            title={`Export audio as ${exportFormat.toUpperCase()}`}
+          >
+            <span className="export-icon" aria-hidden="true">
+              {isExporting ? '⏳' : '💾'}
+            </span>
+            <span className="export-btn-label">
+              {isExporting ? 'Exporting...' : 'Export'}
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* Separate Export Button */}
-      <div className="export-action-row">
-        <button
-          type="button"
-          className={`export-btn ${isExporting ? 'is-loading' : ''}`}
-          onClick={handleExportClick}
-          disabled={isExporting}
-          aria-label={`${buttonLabel} file (${exportFormat})`}
-        >
-          <span className="export-icon" aria-hidden="true">
-            {isExporting ? '⏳' : '💾'}
-          </span>
-          {isExporting ? 'Exporting...' : buttonLabel}
-        </button>
-
-        {getStatusText() && (
-          <p className={`export-status-message status-${exportStatus}`} aria-live="polite">
-            {getStatusText()}
-          </p>
-        )}
-      </div>
+      {getStatusText() && (
+        <p className={`export-status-message status-${exportStatus}`} aria-live="polite">
+          {getStatusText()}
+        </p>
+      )}
 
       {/* Warning popup modal for WAV sessions > 60 minutes */}
       {showWavWarningModal && (
