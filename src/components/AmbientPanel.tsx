@@ -130,7 +130,7 @@ export function AmbientPanel() {
             );
           })}
 
-          {ambientLayers.length < 8 && (
+          {Boolean(ambientLayers[0]?.soundId) && ambientLayers.length < 8 && (
             <button
               type="button"
               className="add-layer-btn"

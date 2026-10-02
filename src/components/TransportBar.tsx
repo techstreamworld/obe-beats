@@ -65,47 +65,46 @@ export function TransportBar() {
 
   return (
     <div className="transport-bar" role="toolbar" aria-label="Audio playback controls">
-      {/* Playback Seek Bar to the left of Play/Pause button */}
-      {playback !== 'stopped' && timerDuration > 0 && (
-        <div className="transport-playback-bar" aria-label="Playback progress and seeking">
-          <div className="playback-slider-container">
-            <input
-              type="range"
-              className="playback-slider"
-              min={0}
-              max={timerDuration}
-              step={1}
-              value={displayElapsed}
-              onPointerDown={() => setIsScrubbing(true)}
-              onChange={(e) => setScrubValue(Number(e.target.value))}
-              onPointerUp={(e) =>
-                handleSeekCommit(Number((e.target as HTMLInputElement).value))
-              }
-              onKeyUp={(e) =>
-                handleSeekCommit(Number((e.target as HTMLInputElement).value))
-              }
-              aria-label="Seek session playback. Drag to jump to any time point."
-            />
-            {intervalEnabled && intervalMinutes > 0 && (
-              <div className="interval-indicators-layer" aria-hidden="true">
-                {intervalMarkers.map((sec) => (
-                  <div
-                    key={sec}
-                    className="interval-bar-indicator"
-                    style={{
-                      left: `calc(9px + (100% - 18px) * ${sec / timerDuration})`,
-                    }}
-                    title={`Interval cue at ${formatTime(sec)}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-          <span className="playback-time-inline" aria-live="polite">
-            {formatTime(displayElapsed)} / {formatTime(timerDuration)}
-          </span>
+      {/* Playback Seek Bar to the left of Play/Pause button - always visible */}
+      <div className="transport-playback-bar" aria-label="Playback progress and seeking">
+        <div className="playback-slider-container">
+          <input
+            type="range"
+            className="playback-slider"
+            min={0}
+            max={timerDuration > 0 ? timerDuration : 100}
+            step={1}
+            disabled={timerDuration === 0}
+            value={displayElapsed}
+            onPointerDown={() => setIsScrubbing(true)}
+            onChange={(e) => setScrubValue(Number(e.target.value))}
+            onPointerUp={(e) =>
+              handleSeekCommit(Number((e.target as HTMLInputElement).value))
+            }
+            onKeyUp={(e) =>
+              handleSeekCommit(Number((e.target as HTMLInputElement).value))
+            }
+            aria-label="Seek session playback. Drag to jump to any time point."
+          />
+          {intervalEnabled && intervalMinutes > 0 && timerDuration > 0 && (
+            <div className="interval-indicators-layer" aria-hidden="true">
+              {intervalMarkers.map((sec) => (
+                <div
+                  key={sec}
+                  className="interval-bar-indicator"
+                  style={{
+                    left: `calc(9px + (100% - 18px) * ${sec / timerDuration})`,
+                  }}
+                  title={`Interval cue at ${formatTime(sec)}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+        <span className="playback-time-inline" aria-live="polite">
+          {formatTime(displayElapsed)} / {timerDuration > 0 ? formatTime(timerDuration) : '--:--'}
+        </span>
+      </div>
 
       {/* Play / Pause button */}
       <button

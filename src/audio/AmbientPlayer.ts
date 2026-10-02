@@ -32,6 +32,34 @@ interface ActiveLayer {
   noiseSourceNode: AudioBufferSourceNode | null;
 }
 
+/**
+ * Returns sound-specific gain multiplier:
+ * - Nature sounds (deep-sea, fireplace, rain, ocean-waves, river) are boosted for richer volume
+ * - White noise is attenuated so it is not harsh/piercing
+ * - Black noise is boosted for deep sub-bass
+ */
+export function getAmbientSoundBoost(soundId: string | null): number {
+  if (!soundId) return 1.0;
+  switch (soundId) {
+    case 'deep-sea':
+      return 2.5;
+    case 'fireplace':
+      return 2.3;
+    case 'rain':
+      return 2.1;
+    case 'ocean-waves':
+      return 2.3;
+    case 'river':
+      return 2.1;
+    case 'white-noise':
+      return 0.5; // Soften white noise so it doesn't overpower
+    case 'black-noise':
+      return 1.6; // Rich sub-bass presence
+    default:
+      return 1.0;
+  }
+}
+
 export class AmbientPlayer {
   private ctx: AudioContext;
   private destination: AudioNode;
@@ -82,8 +110,7 @@ export class AmbientPlayer {
 
   private getEffectiveGain(soundId: string | null, volume: number): number {
     if (!soundId) return 0;
-    // Boost black noise volume so it has rich, powerful sub-bass presence
-    const boost = soundId === 'black-noise' ? 1.6 : 1.0;
+    const boost = getAmbientSoundBoost(soundId);
     return volume * AMBIENT_GAIN_SCALE * boost;
   }
 

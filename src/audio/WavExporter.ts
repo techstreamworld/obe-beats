@@ -3,7 +3,7 @@
 // Pure Web Audio API / TypeScript — no React.
 
 import { Mp3Encoder } from '@breezystack/lamejs';
-import { AMBIENT_GAIN_SCALE } from './AmbientPlayer.ts';
+import { AMBIENT_GAIN_SCALE, getAmbientSoundBoost } from './AmbientPlayer.ts';
 import { NoiseGenerator } from './NoiseGenerator.ts';
 import { IntervalSynthesizer } from './IntervalSynthesizer.ts';
 import type { AmbientLayer, IntervalTone } from '../types/index.ts';
@@ -153,7 +153,7 @@ export class WavExporter {
 
       for (const layer of layersToRender) {
         if (!layer.soundId) continue;
-        const boost = layer.soundId === 'black-noise' ? 1.6 : 1.0;
+        const boost = getAmbientSoundBoost(layer.soundId);
         const ambientGain = offlineCtx.createGain();
         ambientGain.gain.setValueAtTime(layer.volume * AMBIENT_GAIN_SCALE * boost, 0);
         ambientGain.connect(masterGain);

@@ -79,7 +79,10 @@ export function IntervalPanel() {
             title={isIntervalPreviewing ? 'Stop preview' : `Preview interval sound (${intervalRepeatCount}×)`}
             aria-label={isIntervalPreviewing ? 'Stop preview' : 'Preview interval sound'}
           >
-            {isIntervalPreviewing ? 'Stop' : 'Preview'}
+            <span className="interval-preview-icon" aria-hidden="true">
+              {isIntervalPreviewing ? '⏹' : '▶'}
+            </span>
+            <span>{isIntervalPreviewing ? 'Stop' : 'Preview'}</span>
           </button>
         )}
       </div>

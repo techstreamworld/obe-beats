@@ -71,6 +71,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
   font-family: var(--sans);
   font-size: 11.5px;
   font-weight: 600;
@@ -83,6 +84,13 @@
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
+}
+
+.interval-preview-icon {
+  font-size: 9.5px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .interval-preview-btn-compact:hover {

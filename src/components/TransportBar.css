@@ -108,8 +108,8 @@
   border-radius: 9999px;
   padding: 4px 16px;
   min-height: 40px;
-  min-width: 260px;
-  max-width: 650px;
+  min-width: 240px;
+  max-width: 520px;
   flex: 1;
   box-sizing: border-box;
   animation: fadeIn 0.15s ease;
