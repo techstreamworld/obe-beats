@@ -220,13 +220,15 @@ export function UploadPanel() {
 
               {uploadBuffer && (
                 <div className="control-row upload-volume-row">
-                  <label htmlFor="upload-volume">Volume (%)</label>
-                  <div className="slider-group">
+                  <div className="control-label-group">
+                    <label htmlFor="upload-volume">Volume (%)</label>
                     <VolumeMuteButton
                       volume={uploadVolume}
                       onChange={(v) => setUploadVolume(v)}
                       label="Upload volume"
                     />
+                  </div>
+                  <div className="slider-group">
                     <input
                       id="upload-volume"
                       type="range"

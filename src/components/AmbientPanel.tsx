@@ -102,15 +102,15 @@ export function AmbientPanel() {
                 {/* Volume (only shown when an ambient sound is selected for this layer) */}
                 {isSelected && (
                   <div className="control-row ambient-volume-row">
-                    <label htmlFor={`ambient-volume-${layer.id}`}>
-                      {ambientLayers.length > 1 ? `Sound ${index + 1} Volume (%)` : 'Volume (%)'}
-                    </label>
-                    <div className="slider-group">
+                    <div className="control-label-group">
+                      <label htmlFor={`ambient-volume-${layer.id}`}>Volume (%)</label>
                       <VolumeMuteButton
                         volume={layer.volume}
                         onChange={(v) => setAmbientLayerVolume(layer.id, v)}
                         label={ambientLayers.length > 1 ? `Sound ${index + 1} volume` : 'Ambient volume'}
                       />
+                    </div>
+                    <div className="slider-group">
                       <input
                         id={`ambient-volume-${layer.id}`}
                         type="range"

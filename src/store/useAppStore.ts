@@ -192,6 +192,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
 
     set((state) => ({
+      playback: 'playing',
+      restartKey: state.restartKey + 1,
       activePresetId: preset.id,
       binauralEnabled: preset.binauralEnabled,
       binauralVolume: preset.binauralVolume ?? 0.5,
@@ -204,7 +206,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       timerDurationSeconds: preset.timerDurationSeconds,
       timerState: {
         remainingSeconds: preset.timerDurationSeconds,
-        isRunning: state.playback === 'playing',
+        isRunning: true,
       },
       ambientEnabled: preset.ambientEnabled,
       ambientLayers,

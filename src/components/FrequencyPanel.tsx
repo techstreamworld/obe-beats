@@ -140,13 +140,15 @@ export function FrequencyPanel() {
 
           {/* Volume */}
           <div className="control-row">
-            <label htmlFor="binaural-tone-vol">Volume (%)</label>
-            <div className="slider-group">
+            <div className="control-label-group">
+              <label htmlFor="binaural-tone-vol">Volume (%)</label>
               <VolumeMuteButton
                 volume={binauralVolume}
                 onChange={(v) => setBinauralVolume(v)}
                 label="Tone volume"
               />
+            </div>
+            <div className="slider-group">
               <input
                 id="binaural-tone-vol"
                 type="range"

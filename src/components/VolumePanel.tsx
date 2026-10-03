@@ -19,13 +19,15 @@ export function VolumePanel() {
     <div className="volume-panel">
       {/* Master Volume */}
       <div className="control-row">
-        <label htmlFor="vol-master">Main Volume (%)</label>
-        <div className="slider-group">
+        <div className="control-label-group">
+          <label htmlFor="vol-master">Main Volume (%)</label>
           <VolumeMuteButton
             volume={masterVolume}
             onChange={(v) => setMasterVolume(v)}
             label="Main volume"
           />
+        </div>
+        <div className="slider-group">
           <input
             id="vol-master"
             type="range"

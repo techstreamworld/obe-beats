@@ -55,13 +55,15 @@ export function TimerPanel() {
 
       {/* Main Volume */}
       <div className="control-row master-volume-row">
-        <label htmlFor="vol-master">Main Volume (%)</label>
-        <div className="slider-group">
+        <div className="control-label-group">
+          <label htmlFor="vol-master">Main Volume (%)</label>
           <VolumeMuteButton
             volume={masterVolume}
             onChange={(v) => setMasterVolume(v)}
             label="Main volume"
           />
+        </div>
+        <div className="slider-group">
           <input
             id="vol-master"
             type="range"

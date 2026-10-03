@@ -28,7 +28,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-width: 105px;
+  width: 135px;
+  min-width: 135px;
   flex-shrink: 0;
 }
 

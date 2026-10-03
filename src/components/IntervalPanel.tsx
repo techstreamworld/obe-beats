@@ -153,13 +153,15 @@ export function IntervalPanel() {
 
           {/* Interval Volume */}
           <div className="control-row">
-            <label htmlFor="interval-volume">Volume (%)</label>
-            <div className="slider-group">
+            <div className="control-label-group">
+              <label htmlFor="interval-volume">Volume (%)</label>
               <VolumeMuteButton
                 volume={intervalVolume}
                 onChange={(v) => setIntervalVolume(v)}
                 label="Interval volume"
               />
+            </div>
+            <div className="slider-group">
               <input
                 id="interval-volume"
                 type="range"

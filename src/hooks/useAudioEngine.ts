@@ -8,6 +8,7 @@ import { useAppStore } from '../store/useAppStore.ts';
 
 export function useAudioEngine(): void {
   const playback = useAppStore((s) => s.playback);
+  const restartKey = useAppStore((s) => s.restartKey);
   const binauralEnabled = useAppStore((s) => s.binauralEnabled);
   const binauralVolume = useAppStore((s) => s.binauralVolume);
   const carrierFrequency = useAppStore((s) => s.carrierFrequency);
@@ -36,7 +37,7 @@ export function useAudioEngine(): void {
     } else {
       engine.stop();
     }
-  }, [playback]);
+  }, [playback, restartKey]);
 
   // ── Sync binaural beats enabled & frequencies ──
   useEffect(() => {
