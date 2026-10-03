@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import './FrequencyPanel.css';
 
 interface BrainwaveBand {
@@ -141,6 +142,11 @@ export function FrequencyPanel() {
           <div className="control-row">
             <label htmlFor="binaural-tone-vol">Volume (%)</label>
             <div className="slider-group">
+              <VolumeMuteButton
+                volume={binauralVolume}
+                onChange={(v) => setBinauralVolume(v)}
+                label="Tone volume"
+              />
               <input
                 id="binaural-tone-vol"
                 type="range"

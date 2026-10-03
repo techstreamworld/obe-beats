@@ -107,8 +107,7 @@ p {
 }
 
 .control-row > label,
-.control-row > .ambient-layer-header,
-.control-row > .ear-balance-label-row {
+.control-row > .ambient-layer-header {
   min-width: 110px;
   flex-shrink: 0;
   white-space: nowrap;
@@ -132,8 +131,7 @@ p {
     gap: 8px;
   }
   .control-row > label,
-  .control-row > .ambient-layer-header,
-  .control-row > .ear-balance-label-row {
+  .control-row > .ambient-layer-header {
     min-width: 90px;
     font-size: 12px;
   }

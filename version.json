@@ -1,4 +1,4 @@
 {
-  "version": 273,
-  "lastUpdate": "Updated ExportButton.tsx"
+  "version": 305,
+  "lastUpdate": "Added volume mute toggles, updated presets order, 150Hz OBE carrier default, adjusted ambient volumes, clean balance row, and dynamic export time estimation"
 }

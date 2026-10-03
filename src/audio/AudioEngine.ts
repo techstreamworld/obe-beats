@@ -24,7 +24,7 @@ export class AudioEngine {
 
   // Stored params (applied to nodes when they exist)
   private _binauralEnabled = true;
-  private carrierFreq = 200;
+  private carrierFreq = 150;
   private beatFreq = 3;
   private toneVol = 0.5;
   private masterVol = 0.5;
@@ -364,7 +364,7 @@ export class AudioEngine {
   /** Reset all internal engine state to factory defaults and stop all playback. */
   resetDefaults(): void {
     this.stop();
-    this.carrierFreq = 200;
+    this.carrierFreq = 150;
     this.beatFreq = 3;
     this.toneVol = 0.5;
     this.masterVol = 0.5;

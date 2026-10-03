@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import type { AmbientSoundEntry } from '../types/index.ts';
 import './AmbientPanel.css';
 
@@ -105,6 +106,11 @@ export function AmbientPanel() {
                       {ambientLayers.length > 1 ? `Sound ${index + 1} Volume (%)` : 'Volume (%)'}
                     </label>
                     <div className="slider-group">
+                      <VolumeMuteButton
+                        volume={layer.volume}
+                        onChange={(v) => setAmbientLayerVolume(layer.id, v)}
+                        label={ambientLayers.length > 1 ? `Sound ${index + 1} volume` : 'Ambient volume'}
+                      />
                       <input
                         id={`ambient-volume-${layer.id}`}
                         type="range"

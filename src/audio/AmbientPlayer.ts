@@ -42,7 +42,7 @@ export function getAmbientSoundBoost(soundId: string | null): number {
   if (!soundId) return 1.0;
   switch (soundId) {
     case 'deep-sea':
-      return 2.5;
+      return 3.5; // Louder, rich deep ocean presence
     case 'fireplace':
       return 2.3;
     case 'rain':
@@ -50,9 +50,13 @@ export function getAmbientSoundBoost(soundId: string | null): number {
     case 'ocean-waves':
       return 2.3;
     case 'river':
-      return 2.1;
+      return 1.15; // More quiet gentle stream
     case 'white-noise':
-      return 0.5; // Soften white noise so it doesn't overpower
+      return 0.35; // Softened white noise
+    case 'pink-noise':
+      return 0.70; // Slightly lower pink noise
+    case 'brown-noise':
+      return 0.75; // Slightly lower brown noise
     case 'black-noise':
       return 1.6; // Rich sub-bass presence
     default:

@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import './VolumePanel.css';
 
 export function VolumePanel() {
@@ -20,6 +21,11 @@ export function VolumePanel() {
       <div className="control-row">
         <label htmlFor="vol-master">Main Volume (%)</label>
         <div className="slider-group">
+          <VolumeMuteButton
+            volume={masterVolume}
+            onChange={(v) => setMasterVolume(v)}
+            label="Main volume"
+          />
           <input
             id="vol-master"
             type="range"
@@ -43,16 +49,7 @@ export function VolumePanel() {
 
       {/* Ear Balance Slider */}
       <div className="control-row ear-balance-row">
-        <div className="ear-balance-label-row">
-          <label htmlFor="vol-ear-balance">Balance (%)</label>
-          <span className="ear-balance-center-label">
-            {earBalance === 50
-              ? 'Center'
-              : earBalance < 50
-                ? `L ${Math.round((50 - earBalance) * 2)}%`
-                : `R ${Math.round((earBalance - 50) * 2)}%`}
-          </span>
-        </div>
+        <label htmlFor="vol-ear-balance">Balance (%)</label>
         <div className="slider-group">
           <input
             id="vol-ear-balance"

@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import './TimerPanel.css';
 
 export function TimerPanel() {
@@ -56,6 +57,11 @@ export function TimerPanel() {
       <div className="control-row master-volume-row">
         <label htmlFor="vol-master">Main Volume (%)</label>
         <div className="slider-group">
+          <VolumeMuteButton
+            volume={masterVolume}
+            onChange={(v) => setMasterVolume(v)}
+            label="Main volume"
+          />
           <input
             id="vol-master"
             type="range"
@@ -79,19 +85,7 @@ export function TimerPanel() {
 
       {/* Ear Balance Slider (Combined Left/Right, centered at 50% by default) */}
       <div className="control-row ear-balance-row">
-        <div className="ear-balance-label-row">
-          <label htmlFor="ear-balance">Balance (%)</label>
-          <span
-            className="ear-balance-center-label"
-            title="0 = Left, 50 = Center, 100 = Right. Double click slider to reset."
-          >
-            {earBalance === 50
-              ? 'Center'
-              : earBalance < 50
-                ? `L ${Math.round((50 - earBalance) * 2)}%`
-                : `R ${Math.round((earBalance - 50) * 2)}%`}
-          </span>
-        </div>
+        <label htmlFor="ear-balance">Balance (%)</label>
         <div className="slider-group">
           <input
             id="ear-balance"

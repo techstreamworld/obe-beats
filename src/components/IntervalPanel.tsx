@@ -1,6 +1,7 @@
 import { AudioEngine } from '../audio/AudioEngine.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import type { IntervalTone } from '../types/index.ts';
 import './IntervalPanel.css';
 
@@ -154,6 +155,11 @@ export function IntervalPanel() {
           <div className="control-row">
             <label htmlFor="interval-volume">Volume (%)</label>
             <div className="slider-group">
+              <VolumeMuteButton
+                volume={intervalVolume}
+                onChange={(v) => setIntervalVolume(v)}
+                label="Interval volume"
+              />
               <input
                 id="interval-volume"
                 type="range"

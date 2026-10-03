@@ -32,8 +32,10 @@ export function ExportButton() {
   
   // Export cancellation and estimation state
   const abortControllerRef = useRef<AbortController | null>(null);
-  const [estimatedTotalSeconds, setEstimatedTotalSeconds] = useState(0);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [estimatedRemainingSec, setEstimatedRemainingSec] = useState<number | null>(null);
+  const exportStartTimeRef = useRef(0);
+  const latestProgressRef = useRef(0);
 
   // Use session duration (defaults to 5 minutes if timer is Off)
   const exportDuration = timerDurationSeconds > 0 ? timerDurationSeconds : 300;
@@ -50,11 +52,24 @@ export function ExportButton() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showWavWarningModal]);
 
-  // Timer for elapsed seconds
+  // Periodic interval to dynamically recheck status and recalculate accurate remaining time
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (isExporting) {
-      interval = setInterval(() => setElapsedSeconds((p) => p + 1), 1000);
+      interval = setInterval(() => {
+        const elapsedSec = (Date.now() - exportStartTimeRef.current) / 1000;
+        const currentProgress = latestProgressRef.current;
+
+        if (currentProgress > 0.05 && currentProgress < 0.99) {
+          // Accurate recalculation based on actual processed progress rate
+          const progressRate = currentProgress / Math.max(0.5, elapsedSec);
+          const remSec = Math.max(1, Math.round((1 - currentProgress) / progressRate));
+          setEstimatedRemainingSec(remSec);
+        } else {
+          // Smooth countdown before reliable progress rate is established
+          setEstimatedRemainingSec((prev) => (prev !== null && prev > 1 ? prev - 1 : 1));
+        }
+      }, 1000);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -65,17 +80,23 @@ export function ExportButton() {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       setExportStatus('idle');
+      setExportProgress(0);
+      setEstimatedRemainingSec(null);
     }
   };
 
   const executeExport = async (format: ExportFormat) => {
     if (isExporting) return;
 
-    let est = exportDuration / 4;
-    if (format === 'mp3-320') est = exportDuration / 3;
-    else if (format === 'mp3-192') est = exportDuration / 3.5;
-    setEstimatedTotalSeconds(Math.ceil(est));
-    setElapsedSeconds(0);
+    // Initial estimation baseline
+    const initialEst = format === 'wav'
+      ? Math.ceil(exportDuration / 35)
+      : Math.ceil(exportDuration / 4);
+
+    setEstimatedRemainingSec(Math.max(2, initialEst));
+    setExportProgress(0);
+    latestProgressRef.current = 0.05;
+    exportStartTimeRef.current = Date.now();
     abortControllerRef.current = new AbortController();
 
     try {
@@ -102,18 +123,30 @@ export function ExportButton() {
           signal: abortControllerRef.current.signal,
         },
         format,
-        (status) => setExportStatus(status),
+        (status, progress) => {
+          setExportStatus(status);
+          if (progress !== undefined) {
+            latestProgressRef.current = progress;
+            setExportProgress(progress);
+          }
+        },
       );
 
       WavExporter.triggerDownload(blob, filename);
 
       setTimeout(() => {
         setExportStatus('idle');
+        setExportProgress(0);
+        setEstimatedRemainingSec(null);
       }, 2500);
     } catch (err) {
       console.error('Audio export error:', err);
       setExportStatus('error');
-      setTimeout(() => setExportStatus('idle'), 3500);
+      setTimeout(() => {
+        setExportStatus('idle');
+        setExportProgress(0);
+        setEstimatedRemainingSec(null);
+      }, 3500);
     }
   };
 
@@ -142,21 +175,25 @@ export function ExportButton() {
 
   const getStatusText = () => {
     if (exportStatus === 'done') return '✓ Export complete! Downloading...';
-    if (exportStatus === 'error') return '⚠ Export failed or cancelled.';
+    if (exportStatus === 'error') return '⚠ Export cancelled or failed.';
     
-    let baseText: string;
+    const remSuffix = estimatedRemainingSec !== null
+      ? ` (~${estimatedRemainingSec}s remaining)`
+      : '';
+
     if (exportStatus === 'rendering') {
-      baseText = 'Rendering offline audio...';
-    } else if (exportStatus === 'encoding') {
-      baseText = exportFormat === 'wav'
-        ? 'Encoding 16-bit WAV file...'
-        : 'Encoding MP3 audio stream...';
-    } else {
-      return null;
+      return `Rendering offline audio...${remSuffix}`;
     }
 
-    const remaining = Math.max(0, estimatedTotalSeconds - elapsedSeconds);
-    return `${baseText} (~${remaining}s remaining)`;
+    if (exportStatus === 'encoding') {
+      const pctText = exportProgress > 0 ? ` ${Math.round(exportProgress * 100)}%` : '';
+      const baseText = exportFormat === 'wav'
+        ? 'Encoding 16-bit WAV file...'
+        : 'Encoding MP3 audio stream...';
+      return `${baseText}${pctText}${remSuffix}`;
+    }
+
+    return null;
   };
 
   const wavSize = WavExporter.getEstimatedFileSize(exportDuration, 'wav');
@@ -237,16 +274,10 @@ export function ExportButton() {
 
             <div id="wav-warning-desc" className="modal-body">
               <p>
-                Your session duration is <strong>{durationMins} minutes</strong>. An uncompressed
-                16-bit 44.1 kHz WAV file of this length will be approximately <strong>{wavSize}</strong>.
-              </p>
-              <p>
-                Generating and downloading a file this large inside the browser may consume significant memory
-                and can cause browser performance issues or download failures.
+                At <strong>{durationMins} min</strong>, this WAV file will be approximately <strong>{wavSize}</strong>, which may cause browser memory or download issues.
               </p>
               <p className="modal-recommendation">
-                We strongly recommend exporting as <strong>MP3 320 kbps ({mp3_320Size})</strong> for full audio fidelity
-                with reliable performance.
+                We recommend <strong>MP3 320 kbps ({mp3_320Size})</strong> for full audio fidelity with reliable performance.
               </p>
             </div>
 

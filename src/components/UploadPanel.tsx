@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore.ts';
 import { CommitInput } from './CommitInput.tsx';
+import { VolumeMuteButton } from './VolumeMuteButton.tsx';
 import { AudioEngine } from '../audio/AudioEngine.ts';
 import './UploadPanel.css';
 
@@ -14,11 +15,26 @@ export function UploadPanel() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadBuffer, setUploadBuffer] = useState<AudioBuffer | null>(null);
   const [isDecoding, setIsDecoding] = useState(false);
+  const [decodingRemainingSec, setDecodingRemainingSec] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const decodeCancelledRef = useRef(false);
+
+  // Interval for decoding countdown estimation
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
+    if (isDecoding && decodingRemainingSec > 1) {
+      timer = setInterval(() => {
+        setDecodingRemainingSec((prev) => Math.max(1, prev - 1));
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isDecoding, decodingRemainingSec]);
 
   const parsePercent = (str: string) => {
     const num = parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -30,35 +46,56 @@ export function UploadPanel() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    decodeCancelledRef.current = false;
     setUploadFile(file);
     setIsDecoding(true);
+    // Estimate ~1s per 15MB of audio file for in-browser decoding
+    const estSec = Math.max(1, Math.ceil(file.size / (15 * 1024 * 1024)));
+    setDecodingRemainingSec(estSec);
     setErrorMsg(null);
 
     try {
       const arrayBuffer = await file.arrayBuffer();
+      if (decodeCancelledRef.current) return;
+
       const ctx = AudioEngine.getInstance().getContext();
       if (!ctx) {
-        // If context isn't ready yet, force a brief initialization
         const engine = AudioEngine.getInstance();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (engine as any).ensureContext();
       }
       
       const decodeCtx = AudioEngine.getInstance().getContext() || new AudioContext();
-      
       const audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer);
+
+      if (decodeCancelledRef.current) return;
       setUploadBuffer(audioBuffer);
     } catch (err) {
+      if (decodeCancelledRef.current) return;
       console.error('Failed to decode audio file:', err);
       setErrorMsg('Failed to read or decode audio file.');
       setUploadFile(null);
       setUploadBuffer(null);
     } finally {
-      setIsDecoding(false);
+      if (!decodeCancelledRef.current) {
+        setIsDecoding(false);
+      }
+    }
+  };
+
+  const handleCancelDecoding = () => {
+    decodeCancelledRef.current = true;
+    setIsDecoding(false);
+    setUploadFile(null);
+    setUploadBuffer(null);
+    setErrorMsg(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   const handleClear = () => {
+    decodeCancelledRef.current = true;
     setUploadFile(null);
     setUploadBuffer(null);
     setErrorMsg(null);
@@ -165,12 +202,31 @@ export function UploadPanel() {
                 </button>
               </div>
 
-              {isDecoding && <div className="upload-decoding">Decoding audio...</div>}
+              {isDecoding && (
+                <div className="upload-decoding-row">
+                  <span className="upload-decoding">
+                    Decoding audio... (~{decodingRemainingSec}s remaining)
+                  </span>
+                  <button
+                    type="button"
+                    className="upload-cancel-btn"
+                    onClick={handleCancelDecoding}
+                    title="Cancel decoding"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
 
               {uploadBuffer && (
                 <div className="control-row upload-volume-row">
                   <label htmlFor="upload-volume">Volume (%)</label>
                   <div className="slider-group">
+                    <VolumeMuteButton
+                      volume={uploadVolume}
+                      onChange={(v) => setUploadVolume(v)}
+                      label="Upload volume"
+                    />
                     <input
                       id="upload-volume"
                       type="range"

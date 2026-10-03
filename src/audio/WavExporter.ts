@@ -74,13 +74,11 @@ export class WavExporter {
   static async exportAudio(
     options: RenderOptions,
     format: ExportFormat = 'wav',
-    onStatusChange?: (status: 'rendering' | 'encoding' | 'done') => void,
+    onStatusChange?: (status: 'rendering' | 'encoding' | 'done', progress?: number) => void,
   ): Promise<ExportResult> {
     const sampleRate = options.sampleRate ?? 44100;
     const duration = Math.max(1, options.durationSeconds);
     const totalSamples = Math.floor(sampleRate * duration);
-
-    onStatusChange?.('rendering');
 
     const offlineCtx = new OfflineAudioContext(2, totalSamples, sampleRate);
 
@@ -254,12 +252,29 @@ export class WavExporter {
     }
 
     // ── Offline Render ──
-    const renderedBuffer = await offlineCtx.startRendering();
+    const renderTargetProgress = format === 'wav' ? 0.85 : 0.20;
+    const estimatedRenderSeconds = Math.max(1, duration / 35);
+    let renderProgress = 0.05;
+    onStatusChange?.('rendering', renderProgress);
+
+    const renderTicker = setInterval(() => {
+      if (renderProgress < renderTargetProgress * 0.95) {
+        renderProgress += renderTargetProgress / (estimatedRenderSeconds * 10);
+        onStatusChange?.('rendering', Math.min(renderProgress, renderTargetProgress * 0.95));
+      }
+    }, 100);
+
+    let renderedBuffer: AudioBuffer;
+    try {
+      renderedBuffer = await offlineCtx.startRendering();
+    } finally {
+      clearInterval(renderTicker);
+    }
 
     if (options.signal?.aborted) throw new Error('Export cancelled');
 
     // ── Encoding ──
-    onStatusChange?.('encoding');
+    onStatusChange?.('encoding', renderTargetProgress);
 
     let blob: Blob;
     let extension: string;
@@ -267,11 +282,15 @@ export class WavExporter {
     const baseName = `obe-beats_${options.carrierFrequency}hz_${options.beatFrequency}hz_${durationMin}m`;
 
     if (format === 'wav') {
-      blob = this.encodeWav(renderedBuffer);
+      blob = await this.encodeWav(renderedBuffer, options.signal, (frac) => {
+        onStatusChange?.('encoding', renderTargetProgress + frac * (1 - renderTargetProgress));
+      });
       extension = 'wav';
     } else {
       const kbps = format === 'mp3-320' ? 320 : 192;
-      blob = await this.encodeMp3(renderedBuffer, kbps, options.signal);
+      blob = await this.encodeMp3(renderedBuffer, kbps, options.signal, (frac) => {
+        onStatusChange?.('encoding', renderTargetProgress + frac * (1 - renderTargetProgress));
+      });
       extension = `${kbps}kbps.mp3`;
     }
 
@@ -279,7 +298,7 @@ export class WavExporter {
 
     const filename = `${baseName}.${extension}`;
 
-    onStatusChange?.('done');
+    onStatusChange?.('done', 1.0);
     return { blob, filename };
   }
 
@@ -352,11 +371,16 @@ export class WavExporter {
   /**
    * Encodes an AudioBuffer into 16-bit PCM Stereo WAV format.
    */
-  private static encodeWav(buffer: AudioBuffer): Blob {
+  private static async encodeWav(
+    buffer: AudioBuffer,
+    signal?: AbortSignal,
+    onProgress?: (fraction: number) => void,
+  ): Promise<Blob> {
     const numChannels = 2;
     const sampleRate = buffer.sampleRate;
-    const numFrames = buffer.length;
     const bytesPerSample = 2; // 16-bit
+    const numFrames = buffer.length;
+
     const blockAlign = numChannels * bytesPerSample;
     const byteRate = sampleRate * blockAlign;
     const dataSize = numFrames * blockAlign;
@@ -389,6 +413,7 @@ export class WavExporter {
     const rightData = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : leftData;
 
     let offset = 44;
+    const yieldBlockSize = 250000;
     for (let i = 0; i < numFrames; i++) {
       let sLeft = leftData[i];
       sLeft = Math.max(-1, Math.min(1, sLeft));
@@ -399,7 +424,14 @@ export class WavExporter {
       sRight = Math.max(-1, Math.min(1, sRight));
       view.setInt16(offset, sRight < 0 ? sRight * 0x8000 : sRight * 0x7FFF, true);
       offset += 2;
+
+      if (i > 0 && i % yieldBlockSize === 0) {
+        if (signal?.aborted) throw new Error('Export cancelled');
+        onProgress?.(i / numFrames);
+        await new Promise((r) => setTimeout(r, 0));
+      }
     }
+    onProgress?.(1.0);
 
     return new Blob([arrayBuffer], { type: 'audio/wav' });
   }
@@ -407,7 +439,12 @@ export class WavExporter {
   /**
    * Encodes an AudioBuffer into MP3 format at the specified bitrate.
    */
-  private static async encodeMp3(buffer: AudioBuffer, kbps: number, signal?: AbortSignal): Promise<Blob> {
+  private static async encodeMp3(
+    buffer: AudioBuffer,
+    kbps: number,
+    signal?: AbortSignal,
+    onProgress?: (fraction: number) => void,
+  ): Promise<Blob> {
     const numChannels = 2;
     const sampleRate = buffer.sampleRate;
     const numFrames = buffer.length;
@@ -446,9 +483,11 @@ export class WavExporter {
       chunksProcessed++;
       // Yield to event loop every ~1 second of audio (approx 40 chunks of 1152 samples at 44.1kHz)
       if (chunksProcessed % 40 === 0) {
+        onProgress?.(i / numFrames);
         await new Promise(r => setTimeout(r, 0));
       }
     }
+    onProgress?.(1.0);
 
     const end = encoder.flush();
     if (end.length > 0) {
