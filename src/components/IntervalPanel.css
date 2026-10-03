@@ -114,8 +114,8 @@
 .interval-options-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 4px;
+  gap: 6px;
+  padding-top: 2px;
   animation: intervalFadeIn 0.18s ease-out;
 }
 
@@ -133,20 +133,21 @@
 .interval-select {
   flex: 1;
   min-width: 0;
-  min-height: 40px;
-  padding: 8px 14px;
+  height: 30px;
+  min-height: 30px;
+  padding: 3px 12px;
   border: 1px solid var(--border-light);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--bg-input);
   color: var(--text-h);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2381899B' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  padding-right: 36px;
+  padding-right: 32px;
 }
 
 .interval-select:focus-visible {

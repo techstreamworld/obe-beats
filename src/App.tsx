@@ -53,16 +53,16 @@ function App() {
             <section className="panel" aria-label="Interval Sound">
               <IntervalPanel />
             </section>
-
-            <section className="panel" aria-label="Upload Audio">
-              <UploadPanel />
-            </section>
           </div>
 
-          {/* Right Controls Column: Session Runtime, Master Volume & Audio Export */}
+          {/* Right Controls Column: Session Runtime, Master Volume, Custom Audio & Export */}
           <div className="app-column">
             <section className="panel" aria-label="Session Duration & Master Volume">
               <TimerPanel />
+            </section>
+
+            <section className="panel" aria-label="Upload Audio">
+              <UploadPanel />
             </section>
 
             <section className="panel" aria-label="Audio Export (WAV / MP3)">

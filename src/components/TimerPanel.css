@@ -3,7 +3,7 @@
 .timer-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .session-duration-row {

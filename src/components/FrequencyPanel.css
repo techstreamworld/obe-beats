@@ -3,7 +3,7 @@
 .frequency-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .binaural-toggle-row {
@@ -16,7 +16,7 @@
 .binaural-options-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   animation: fadeIn 0.15s ease;
 }
 

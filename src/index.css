@@ -94,8 +94,8 @@ p {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  min-height: 40px;
+  gap: 12px;
+  min-height: 32px;
   width: 100%;
 }
 
@@ -133,6 +133,11 @@ p {
 .control-row select {
   flex: 1;
   min-width: 0;
+  height: 30px;
+  min-height: 30px;
+  padding: 3px 12px;
+  font-size: 13px;
+  border-radius: 8px;
 }
 
 @media (max-width: 480px) {
@@ -152,7 +157,7 @@ p {
   flex: 1;
   min-width: 0;
   height: 6px;
-  padding: 16px 0; /* Expands interactive touch hit-box */
+  padding: 10px 0; /* Expands interactive touch hit-box */
   appearance: none;
   background: transparent;
   outline: none;
