@@ -42,12 +42,10 @@ export function UploadPanel() {
     return Math.min(1, Math.max(0, Math.round(num) / 100));
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = async (file: File) => {
     decodeCancelledRef.current = false;
     setUploadFile(file);
+    setUploadEnabled(true);
     setIsDecoding(true);
     // Estimate ~1s per 15MB of audio file for in-browser decoding
     const estSec = Math.max(1, Math.ceil(file.size / (15 * 1024 * 1024)));
@@ -76,10 +74,26 @@ export function UploadPanel() {
       setErrorMsg('Failed to read or decode audio file.');
       setUploadFile(null);
       setUploadBuffer(null);
+      setUploadEnabled(false);
     } finally {
       if (!decodeCancelledRef.current) {
         setIsDecoding(false);
       }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
     }
   };
 
@@ -88,6 +102,7 @@ export function UploadPanel() {
     setIsDecoding(false);
     setUploadFile(null);
     setUploadBuffer(null);
+    setUploadEnabled(false);
     setErrorMsg(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -98,6 +113,7 @@ export function UploadPanel() {
     decodeCancelledRef.current = true;
     setUploadFile(null);
     setUploadBuffer(null);
+    setUploadEnabled(false);
     setErrorMsg(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -161,43 +177,60 @@ export function UploadPanel() {
 
   return (
     <div className="upload-panel">
-      <div className="panel-toggle-row">
-        <label className="panel-checkbox-label" htmlFor="upload-enabled-checkbox">
-          <input
-            id="upload-enabled-checkbox"
-            type="checkbox"
-            className="panel-checkbox"
-            checked={uploadEnabled}
-            onChange={(e) => setUploadEnabled(e.target.checked)}
-          />
+      {/* Option 1: When empty, show clean title with NO checkbox. Once file uploaded, show checkbox toggle. */}
+      {uploadFile ? (
+        <div className="panel-toggle-row">
+          <label className="panel-checkbox-label" htmlFor="upload-enabled-checkbox">
+            <input
+              id="upload-enabled-checkbox"
+              type="checkbox"
+              className="panel-checkbox"
+              checked={uploadEnabled}
+              onChange={(e) => setUploadEnabled(e.target.checked)}
+            />
+            <span className="panel-checkbox-title">Upload Audio</span>
+          </label>
+        </div>
+      ) : (
+        <div className="panel-toggle-row upload-title-row">
           <span className="panel-checkbox-title">Upload Audio</span>
-        </label>
-      </div>
+        </div>
+      )}
 
-      {uploadEnabled && (
-        <div className="upload-options-container">
-          {!uploadFile && (
-            <label className="upload-drop-zone">
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="upload-hidden-input"
-                accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus"
-                onChange={handleFileChange}
-              />
-              <div className="upload-prompt">
-                {isDecoding ? 'Decoding...' : 'Click or drop audio file here'}
-              </div>
-            </label>
-          )}
-
+      {!uploadFile ? (
+        <>
+          <label
+            className="upload-drop-zone"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="upload-hidden-input"
+              accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus"
+              onChange={handleFileChange}
+            />
+            <div className="upload-prompt">
+              {isDecoding ? 'Decoding...' : '+ Click or drop audio file here'}
+            </div>
+          </label>
           {errorMsg && <div className="upload-error">{errorMsg}</div>}
+        </>
+      ) : (
+        uploadEnabled && (
+          <div className="upload-options-container">
+            {errorMsg && <div className="upload-error">{errorMsg}</div>}
 
-          {uploadFile && (
             <div className="upload-file-info">
               <div className="upload-filename">
                 <span>{uploadFile.name}</span>
-                <button type="button" className="upload-clear-btn" onClick={handleClear}>
+                <button
+                  type="button"
+                  className="upload-clear-btn"
+                  onClick={handleClear}
+                  title="Remove uploaded audio"
+                >
                   ✕
                 </button>
               </div>
@@ -251,8 +284,8 @@ export function UploadPanel() {
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )
       )}
     </div>
   );

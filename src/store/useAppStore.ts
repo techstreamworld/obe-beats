@@ -291,7 +291,15 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // Timer & fades
-  setTimerDuration: (s) => set({ timerDurationSeconds: s, activePresetId: null }),
+  setTimerDuration: (s) =>
+    set((state) => ({
+      timerDurationSeconds: s,
+      activePresetId: null,
+      timerState:
+        state.playback === 'stopped'
+          ? { remainingSeconds: s, isRunning: false }
+          : state.timerState,
+    })),
   setFadeIn: (s) => set({ fadeInSeconds: s }),
   setFadeOut: (s) => set({ fadeOutSeconds: s }),
   updateTimerState: (partial) =>

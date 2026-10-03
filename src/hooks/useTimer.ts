@@ -114,10 +114,10 @@ export function useTimer(): void {
       timerRef.current?.pause();
       updateTimerState({ isRunning: false });
     } else {
-      // Stopped
+      // Stopped: reset countdown to start of session (00:00 elapsed)
       timerRef.current?.stop();
       fadeOutTriggered.current = false;
-      updateTimerState({ remainingSeconds: 0, isRunning: false });
+      updateTimerState({ remainingSeconds: timerDurationRef.current, isRunning: false });
     }
   }, [playback, restartKey, fadeInSeconds, updateTimerState]);
 
@@ -125,9 +125,11 @@ export function useTimer(): void {
   useEffect(() => {
     if (playback === 'playing' && timerRef.current) {
       timerRef.current.adjustDuration(timerDuration, prevDurationRef.current);
+    } else if (playback === 'stopped') {
+      updateTimerState({ remainingSeconds: timerDuration, isRunning: false });
     }
     prevDurationRef.current = timerDuration;
-  }, [timerDuration, playback]);
+  }, [timerDuration, playback, updateTimerState]);
 
   // Seek effect: coordinates countdown, audio engine, and fade triggers
   const seekRequest = useAppStore((s) => s.seekRequest);

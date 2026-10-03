@@ -1,4 +1,4 @@
 {
-  "version": 331,
-  "lastUpdate": "Balanced 3+3 columns, tightened panel padding & gaps, compact inputs & matching buttons"
+  "version": 337,
+  "lastUpdate": "Swapped Upload and Interval panels, fixed default 00:00 playback timer, implemented direct compact drop zone"
 }
