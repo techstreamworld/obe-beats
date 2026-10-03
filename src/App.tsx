@@ -6,6 +6,7 @@ import { FrequencyPanel } from './components/FrequencyPanel.tsx';
 import { TimerPanel } from './components/TimerPanel.tsx';
 import { IntervalPanel } from './components/IntervalPanel.tsx';
 import { AmbientPanel } from './components/AmbientPanel.tsx';
+import { UploadPanel } from './components/UploadPanel.tsx';
 import { ExportButton } from './components/ExportButton.tsx';
 import { VersionBar } from './components/VersionBar.tsx';
 import { BlackScreen } from './components/BlackScreen.tsx';
@@ -51,6 +52,10 @@ function App() {
 
             <section className="panel" aria-label="Interval Sound">
               <IntervalPanel />
+            </section>
+
+            <section className="panel" aria-label="Upload Audio">
+              <UploadPanel />
             </section>
           </div>
 

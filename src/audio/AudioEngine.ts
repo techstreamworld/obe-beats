@@ -69,6 +69,14 @@ export class AudioEngine {
 
   // ── Lifecycle ──
 
+  getContext(): AudioContext | null {
+    return this.ctx;
+  }
+
+  getMasterGain(): GainNode | null {
+    return this.masterGain;
+  }
+
   /** Ensure the AudioContext + master gain exist and are resumed. */
   private async ensureContext(): Promise<AudioContext> {
     if (!this.ctx) {

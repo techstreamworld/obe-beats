@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WavExporter, type ExportFormat } from '../audio/WavExporter.ts';
 import { useAppStore } from '../store/useAppStore.ts';
 import './ExportButton.css';
@@ -29,6 +29,11 @@ export function ExportButton() {
 
   // Popup warning modal state for WAV > 60 minutes
   const [showWavWarningModal, setShowWavWarningModal] = useState(false);
+  
+  // Export cancellation and estimation state
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [estimatedTotalSeconds, setEstimatedTotalSeconds] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Use session duration (defaults to 5 minutes if timer is Off)
   const exportDuration = timerDurationSeconds > 0 ? timerDurationSeconds : 300;
@@ -45,8 +50,33 @@ export function ExportButton() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showWavWarningModal]);
 
+  // Timer for elapsed seconds
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isExporting) {
+      interval = setInterval(() => setElapsedSeconds((p) => p + 1), 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isExporting]);
+
+  const cancelExport = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setExportStatus('idle');
+    }
+  };
+
   const executeExport = async (format: ExportFormat) => {
     if (isExporting) return;
+
+    let est = exportDuration / 4;
+    if (format === 'mp3-320') est = exportDuration / 3;
+    else if (format === 'mp3-192') est = exportDuration / 3.5;
+    setEstimatedTotalSeconds(Math.ceil(est));
+    setElapsedSeconds(0);
+    abortControllerRef.current = new AbortController();
 
     try {
       setExportStatus('rendering');
@@ -69,6 +99,7 @@ export function ExportButton() {
           durationSeconds: exportDuration,
           fadeInSeconds,
           fadeOutSeconds,
+          signal: abortControllerRef.current.signal,
         },
         format,
         (status) => setExportStatus(status),
@@ -110,20 +141,22 @@ export function ExportButton() {
   };
 
   const getStatusText = () => {
-    switch (exportStatus) {
-      case 'rendering':
-        return 'Rendering offline audio...';
-      case 'encoding':
-        return exportFormat === 'wav'
-          ? 'Encoding 16-bit WAV file...'
-          : 'Encoding MP3 audio stream...';
-      case 'done':
-        return '✓ Export complete! Downloading...';
-      case 'error':
-        return '⚠ Export failed. Please try again.';
-      default:
-        return null;
+    if (exportStatus === 'done') return '✓ Export complete! Downloading...';
+    if (exportStatus === 'error') return '⚠ Export failed or cancelled.';
+    
+    let baseText: string;
+    if (exportStatus === 'rendering') {
+      baseText = 'Rendering offline audio...';
+    } else if (exportStatus === 'encoding') {
+      baseText = exportFormat === 'wav'
+        ? 'Encoding 16-bit WAV file...'
+        : 'Encoding MP3 audio stream...';
+    } else {
+      return null;
     }
+
+    const remaining = Math.max(0, estimatedTotalSeconds - elapsedSeconds);
+    return `${baseText} (~${remaining}s remaining)`;
   };
 
   const wavSize = WavExporter.getEstimatedFileSize(exportDuration, 'wav');
@@ -149,21 +182,28 @@ export function ExportButton() {
             <option value="mp3-192">MP3 192 kbps (Good) — {mp3_192Size}</option>
           </select>
 
-          <button
-            type="button"
-            className={`export-btn ${isExporting ? 'is-loading' : ''}`}
-            onClick={handleExportClick}
-            disabled={isExporting}
-            aria-label={`Export file (${exportFormat})`}
-            title={`Export audio as ${exportFormat.toUpperCase()}`}
-          >
-            <span className="export-icon" aria-hidden="true">
-              {isExporting ? '⏳' : '💾'}
-            </span>
-            <span className="export-btn-label">
-              {isExporting ? 'Exporting...' : 'Export'}
-            </span>
-          </button>
+          {!isExporting ? (
+            <button
+              type="button"
+              className="export-btn"
+              onClick={handleExportClick}
+              aria-label={`Export file (${exportFormat})`}
+              title={`Export audio as ${exportFormat.toUpperCase()}`}
+            >
+              <span className="export-icon" aria-hidden="true">💾</span>
+              <span className="export-btn-label">Export</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="export-btn export-btn-cancel"
+              onClick={cancelExport}
+              aria-label="Cancel export"
+            >
+              <span className="export-icon" aria-hidden="true">✕</span>
+              <span className="export-btn-label">Cancel</span>
+            </button>
+          )}
         </div>
       </div>
 

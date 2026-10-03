@@ -69,6 +69,8 @@ const DEFAULT_STATE = {
   exportStatus: 'idle' as ExportStatus,
   activePresetId: null as string | null,
   seekRequest: null as { elapsedSeconds: number; key: number } | null,
+  uploadEnabled: false,
+  uploadVolume: 0.5,
 };
 
 // ── Store shape ──
@@ -153,6 +155,12 @@ export interface AppState {
   setExportFormat: (format: ExportFormat) => void;
   exportStatus: ExportStatus;
   setExportStatus: (status: ExportStatus) => void;
+
+  // Upload
+  uploadEnabled: boolean;
+  setUploadEnabled: (enabled: boolean) => void;
+  uploadVolume: number;
+  setUploadVolume: (v: number) => void;
 }
 
 // ── Store ──
@@ -244,6 +252,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       exportFormat: 'wav',
       exportStatus: 'idle',
       activePresetId: null,
+      uploadEnabled: false,
+      uploadVolume: 0.5,
     });
   },
 
@@ -345,4 +355,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Export
   setExportFormat: (format) => set({ exportFormat: format }),
   setExportStatus: (status) => set({ exportStatus: status }),
+
+  // Upload
+  setUploadEnabled: (enabled) => set({ uploadEnabled: enabled, activePresetId: null }),
+  setUploadVolume: (v) => set({ uploadVolume: v }),
 }));

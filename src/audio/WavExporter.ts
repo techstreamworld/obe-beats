@@ -30,6 +30,7 @@ export interface RenderOptions {
   fadeInSeconds: number;
   fadeOutSeconds: number;
   sampleRate?: number;
+  signal?: AbortSignal;
 }
 
 export interface ExportResult {
@@ -255,6 +256,8 @@ export class WavExporter {
     // ── Offline Render ──
     const renderedBuffer = await offlineCtx.startRendering();
 
+    if (options.signal?.aborted) throw new Error('Export cancelled');
+
     // ── Encoding ──
     onStatusChange?.('encoding');
 
@@ -268,9 +271,11 @@ export class WavExporter {
       extension = 'wav';
     } else {
       const kbps = format === 'mp3-320' ? 320 : 192;
-      blob = this.encodeMp3(renderedBuffer, kbps);
+      blob = await this.encodeMp3(renderedBuffer, kbps, options.signal);
       extension = `${kbps}kbps.mp3`;
     }
+
+    if (options.signal?.aborted) throw new Error('Export cancelled');
 
     const filename = `${baseName}.${extension}`;
 
@@ -402,7 +407,7 @@ export class WavExporter {
   /**
    * Encodes an AudioBuffer into MP3 format at the specified bitrate.
    */
-  private static encodeMp3(buffer: AudioBuffer, kbps: number): Blob {
+  private static async encodeMp3(buffer: AudioBuffer, kbps: number, signal?: AbortSignal): Promise<Blob> {
     const numChannels = 2;
     const sampleRate = buffer.sampleRate;
     const numFrames = buffer.length;
@@ -426,13 +431,22 @@ export class WavExporter {
 
     const mp3Chunks: Uint8Array[] = [];
     const sampleBlockSize = 1152;
+    let chunksProcessed = 0;
 
     for (let i = 0; i < numFrames; i += sampleBlockSize) {
+      if (signal?.aborted) throw new Error('Export cancelled');
+      
       const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
       const rightChunk = rightInt16.subarray(i, i + sampleBlockSize);
       const mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
       if (mp3buf.length > 0) {
         mp3Chunks.push(new Uint8Array(mp3buf));
+      }
+      
+      chunksProcessed++;
+      // Yield to event loop every ~1 second of audio (approx 40 chunks of 1152 samples at 44.1kHz)
+      if (chunksProcessed % 40 === 0) {
+        await new Promise(r => setTimeout(r, 0));
       }
     }
 

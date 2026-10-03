@@ -87,6 +87,18 @@
   cursor: wait;
 }
 
+.export-btn-cancel {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.export-btn-cancel:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: #ef4444;
+  color: #ef4444;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+}
+
 .export-btn:focus-visible {
   outline: 2px solid var(--outline-accent);
   outline-offset: 2px;
